@@ -21,6 +21,9 @@
        <el-form-item label="客户端描述" prop="title">
         <el-input v-model="modelData.Description" type="textarea" />
       </el-form-item>
+             <el-form-item label="客户端域名" prop="title">
+        <el-input v-model="modelData.Domains" type="textarea" />
+      </el-form-item>
       <el-form-item label="LogoURI" prop="title">
         <el-input v-model="modelData.LogoURI" />
       </el-form-item>
