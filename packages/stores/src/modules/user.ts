@@ -4,7 +4,7 @@ interface BasicUserInfo {
   /**
    * 头像
    */
-  avatar: string;
+  avatar?: string;
   /**
    * 用户昵称
    */

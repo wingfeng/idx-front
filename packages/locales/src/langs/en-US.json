@@ -88,8 +88,8 @@
   },
   "authentication": {
     "welcomeBack": "Welcome Back",
-    "pageTitle": "Plug-and-play Admin system",
-    "pageDesc": "Efficient, versatile frontend template",
+    "pageTitle": "IDX Admin UI",
+    "pageDesc": "IDX Admin UI is a free and open-source project that provides a modern and intuitive user interface for managing your projects.",
     "loginSuccess": "Login Successful",
     "loginSuccessDesc": "Welcome Back",
     "loginSubtitle": "Enter your account details to manage your projects",

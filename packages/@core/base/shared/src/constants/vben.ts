@@ -1,17 +1,17 @@
 /**
  * @zh_CN GITHUB 仓库地址
  */
-export const VBEN_GITHUB_URL = 'https://github.com/vbenjs/vue-vben-admin';
+export const Project_GITHUB_URL = 'https://github.com/wingfeng/idx';
 
 /**
  * @zh_CN 文档地址
  */
-export const VBEN_DOC_URL = 'https://doc.vben.pro';
+export const Project_DOC_URL = 'https://doc.vben.pro';
 
 /**
  * @zh_CN Vben Logo
  */
-export const VBEN_LOGO_URL =
+export const Project_LOGO_URL =
   'https://unpkg.com/@vbenjs/static-source@0.1.6/source/logo-v1.webp';
 
 /**

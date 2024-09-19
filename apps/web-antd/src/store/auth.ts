@@ -8,9 +8,11 @@ import { DEFAULT_HOME_PATH, LOGIN_PATH } from '@vben/constants';
 import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 
 import { notification } from 'ant-design-vue';
+import { UserManager } from 'oidc-client-ts';
 import { defineStore } from 'pinia';
 
-import { getAccessCodesApi, getUserInfoApi, loginApi, logoutApi } from '#/api';
+import { getAccessCodesApi, loginApi } from '#/api';
+import { oidcSetting } from '#/config/oidcSetting';
 import { $t } from '#/locales';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -76,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout(redirect: boolean = true) {
-    await logoutApi();
+    //   await logoutApi();
     resetAllStores();
     accessStore.setLoginExpired(false);
 
@@ -92,8 +94,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchUserInfo() {
+    console.log('fetch user info by oidc');
+    const um = new UserManager(oidcSetting);
+    const user = await um.getUser();
     let userInfo: null | UserInfo = null;
-    userInfo = await getUserInfoApi();
+    if (!user) {
+      return;
+    }
+    userInfo = {
+      userId: user.profile.sub,
+      userName: user.profile.preferred_username,
+      email: user.profile.email,
+      roles: user.profile.roles,
+      //      avatar: `${user.profile.sub}.png`,
+    };
     userStore.setUserInfo(userInfo);
     return userInfo;
   }

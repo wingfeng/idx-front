@@ -1,18 +1,23 @@
-<script lang="ts" setup>
-import { AuthenticationLogin } from '@vben/common-ui';
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-import { useAuthStore } from '#/store';
+import { UserManager } from 'oidc-client-ts';
 
-defineOptions({ name: 'Login' });
+import { oidcSetting } from '#/config/oidcSetting';
 
-const authStore = useAuthStore();
+export default defineComponent({
+  name: 'Login',
+  mounted() {
+    const userManager = new UserManager(oidcSetting);
+    setTimeout(() => {
+      userManager.signinRedirect();
+    }, 500);
+  },
+});
 </script>
 
 <template>
-  <AuthenticationLogin
-    :loading="authStore.loginLoading"
-    password-placeholder="123456"
-    username-placeholder="vben"
-    @submit="authStore.authLogin"
-  />
+  <div>
+    <h1>IDX Login</h1>
+  </div>
 </template>

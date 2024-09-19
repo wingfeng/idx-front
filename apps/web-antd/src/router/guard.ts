@@ -61,10 +61,15 @@ function setupAccessGuard(router: Router) {
     const accessStore = useAccessStore();
     const userStore = useUserStore();
     const authStore = useAuthStore();
-
+    // console.log('路由守卫', to);
+    // // console.log('accesstoken', accessStore.accessToken);
+    // console.log('userInfo', userStore.userInfo);
     // 基本路由，这些路由不需要进入权限拦截
     if (coreRouteNames.includes(to.name as string)) {
-      if (to.path === LOGIN_PATH && accessStore.accessToken) {
+      if (
+        (to.path === LOGIN_PATH || to.path === '/auth/callback') &&
+        accessStore.accessToken
+      ) {
         return decodeURIComponent(
           (to.query?.redirect as string) || DEFAULT_HOME_PATH,
         );
@@ -100,7 +105,10 @@ function setupAccessGuard(router: Router) {
     // 生成路由表
     // 当前登录用户拥有的角色标识列表
     const userInfo = userStore.userInfo || (await authStore.fetchUserInfo());
-    const userRoles = userInfo.roles ?? [];
+    let userRoles;
+    if (userInfo !== null) {
+      userRoles = userInfo.roles ?? [];
+    }
 
     // 生成菜单和路由
     const { accessibleMenus, accessibleRoutes } = await generateAccess({

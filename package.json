@@ -44,10 +44,6 @@
     "commit": "czg",
     "dev": "turbo-run dev",
     "dev:antd": "pnpm -F @vben/web-antd run dev",
-    "dev:docs": "pnpm -F @vben/docs run dev",
-    "dev:ele": "pnpm -F @vben/web-ele run dev",
-    "dev:naive": "pnpm -F @vben/web-naive run dev",
-    "dev:play": "pnpm -F @vben/playground run dev",
     "format": "vsh lint --format",
     "lint": "vsh lint",
     "postinstall": "turbo run stub",
@@ -59,6 +55,12 @@
     "test:unit": "vitest",
     "update:deps": "pnpm update --latest --recursive",
     "version": "pnpm exec changeset version && pnpm install --no-frozen-lockfile"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "jwks-rsa": "^3.1.0",
+    "oidc-client-ts": "^3.0.1",
+    "vue-request": "^2.0.4"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.0",

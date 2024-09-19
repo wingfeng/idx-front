@@ -4,7 +4,7 @@ import type { NotificationItem } from '@vben/layouts';
 import { computed, ref } from 'vue';
 
 import { AuthenticationLoginExpiredModal } from '@vben/common-ui';
-import { VBEN_DOC_URL, VBEN_GITHUB_URL } from '@vben/constants';
+import { Project_DOC_URL, Project_GITHUB_URL } from '@vben/constants';
 import { BookOpenText, CircleHelp, MdiGithub } from '@vben/icons';
 import {
   BasicLayout,
@@ -60,7 +60,7 @@ const showDot = computed(() =>
 const menus = computed(() => [
   {
     handler: () => {
-      openWindow(VBEN_DOC_URL, {
+      openWindow(Project_DOC_URL, {
         target: '_blank',
       });
     },
@@ -69,7 +69,7 @@ const menus = computed(() => [
   },
   {
     handler: () => {
-      openWindow(VBEN_GITHUB_URL, {
+      openWindow(Project_GITHUB_URL, {
         target: '_blank',
       });
     },
@@ -78,7 +78,7 @@ const menus = computed(() => [
   },
   {
     handler: () => {
-      openWindow(`${VBEN_GITHUB_URL}/issues`, {
+      openWindow(`${Project_GITHUB_URL}/issues`, {
         target: '_blank',
       });
     },
@@ -111,10 +111,10 @@ function handleMakeAll() {
     <template #user-dropdown>
       <UserDropdown
         :avatar
+        :description="userStore.userInfo?.email"
         :menus
+        :tag-text="userStore.userInfo?.roles[0]"
         :text="userStore.userInfo?.realName"
-        description="ann.vben@gmail.com"
-        tag-text="Pro"
         @logout="handleLogout"
       />
     </template>

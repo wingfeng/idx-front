@@ -1,18 +1,18 @@
 {
-  "name": "@vben/web-antd",
-  "version": "5.2.1",
-  "homepage": "https://vben.pro",
-  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
+  "name": "idx-web-antd",
+  "version": "0.1.1",
+  "homepage": "",
+  "bugs": "https://github.com/wingfeng/idx-front/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
+    "url": "git+https://github.com/wingfeng/idx-front.git",
     "directory": "apps/web-antd"
   },
   "license": "MIT",
   "author": {
-    "name": "vben",
-    "email": "ann.vben@gmail.com",
-    "url": "https://github.com/anncwb"
+    "name": "wingfeng",
+    "email": "wingfeng@gmail.com",
+    "url": "https://github.com/wingfeng"
   },
   "type": "module",
   "scripts": {

@@ -15,7 +15,7 @@ export async function node(): Promise<Linter.Config[]> {
         'n/no-deprecated-api': 'error',
         'n/no-exports-assign': 'error',
         'n/no-extraneous-import': [
-          'error',
+          'warn',
           {
             allowModules: [
               'unbuild',
@@ -24,6 +24,7 @@ export async function node(): Promise<Linter.Config[]> {
               'vite',
               '@vue/test-utils',
               '@vben/tailwind-config',
+              'oidc-client-ts',
             ],
           },
         ],

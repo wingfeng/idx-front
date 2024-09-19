@@ -4,8 +4,8 @@ import type { AboutProps, DescriptionItem } from './about';
 import { h } from 'vue';
 
 import {
-  VBEN_DOC_URL,
-  VBEN_GITHUB_URL,
+  Project_DOC_URL,
+  Project_GITHUB_URL,
   VBEN_PREVIEW_URL,
 } from '@vben/constants';
 import { VbenLink, VbenRenderContent } from '@vben-core/shadcn-ui';
@@ -73,7 +73,11 @@ const vbenDescriptionItems: DescriptionItem[] = [
     title: '主页',
   },
   {
-    content: h(VbenLink, { href: VBEN_DOC_URL }, { default: () => '点击查看' }),
+    content: h(
+      VbenLink,
+      { href: Project_DOC_URL },
+      { default: () => '点击查看' },
+    ),
     title: '文档地址',
   },
   {
@@ -87,7 +91,7 @@ const vbenDescriptionItems: DescriptionItem[] = [
   {
     content: h(
       VbenLink,
-      { href: VBEN_GITHUB_URL },
+      { href: Project_GITHUB_URL },
       { default: () => '点击查看' },
     ),
     title: 'Github',
@@ -124,7 +128,7 @@ const devDependenciesItems = Object.keys(devDependencies).map((key) => ({
   <Page :title="title">
     <template #description>
       <p class="text-foreground mt-3 text-sm leading-6">
-        <VbenLink :href="VBEN_GITHUB_URL">
+        <VbenLink :href="Project_GITHUB_URL">
           {{ name }}
         </VbenLink>
         {{ description }}
