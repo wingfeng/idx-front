@@ -106,7 +106,7 @@ function setupAccessGuard(router: Router) {
     // 当前登录用户拥有的角色标识列表
     const userInfo = userStore.userInfo || (await authStore.fetchUserInfo());
     let userRoles;
-    if (userInfo !== null) {
+    if (userInfo !== undefined) {
       userRoles = userInfo.roles ?? [];
     }
 

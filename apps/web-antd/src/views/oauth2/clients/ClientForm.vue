@@ -118,7 +118,7 @@ defineExpose({ validate, resetForm, model });
     :wrapper-col="wrapperCol"
   >
     <a-form-item label="Id">
-      <a-label>{{ model.Id }}</a-label>
+      <label>{{ model.Id }}</label>
     </a-form-item>
     <a-form-item label="Enabled">
       <a-checkbox v-model:checked="model.Enabled" />

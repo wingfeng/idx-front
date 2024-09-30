@@ -7,12 +7,11 @@ import { usePagination } from 'vue-request';
 import {
   DeleteOutlined,
   EditOutlined,
-  ExclamationCircleOutlined,
   MoreOutlined,
   RollbackOutlined,
   SearchOutlined,
 } from '@ant-design/icons-vue';
-import { Divider, Modal } from 'ant-design-vue';
+import { Divider } from 'ant-design-vue';
 
 import { DeleteClient, GetClientsPage, SaveClient } from '#/store/client';
 
@@ -21,8 +20,8 @@ import ClientForm from './ClientForm.vue';
 const columns = [
   {
     title: 'Id',
-    dataIndex: 'Id',
-    key: 'Id',
+    dataIndex: 'id',
+    key: 'id',
     sorter: true,
     defaultSortOrder: 'ascend',
   },
@@ -72,7 +71,7 @@ const searchModel = ref({
   ClientId: '',
   ClientName: '',
 });
-const sortField = ref('Id');
+const sortField = ref('id');
 const sortOrder = ref('asc');
 const filters = computed(() => {
   const tmp = [];
@@ -106,7 +105,7 @@ const {
   defaultParams: {
     page: 1,
     pageSize: 10,
-    sortField: 'Id',
+    sortField: 'id',
     sortOrder: 'asc',
     filters,
     args,
@@ -117,9 +116,10 @@ const {
   },
 });
 const fieldMap = {
-  Id: 'Id',
+  Id: 'id',
   ClientName: 'Client_Name',
   ClientId: 'Client_Id',
+  GrantTypes: 'Grant_Types',
 };
 
 const pagination = computed(() => ({
@@ -166,26 +166,15 @@ const handleReset = () => {
 const open = ref<boolean>(false);
 const row = ref<ClientInfo>();
 const clientForm = ref();
-const handleEdit = (record) => {
+const handleEdit = (record: ClientInfo) => {
   row.value = record;
 
   open.value = true;
 };
-const handleDelete = (Id) => {
-  Modal.confirm({
-    title: `Deleting Client ${Id}`,
-    icon: ExclamationCircleOutlined,
-    content: `Are you sure delete this client ${Id}?`,
-    onOk() {
-      DeleteClient(Id);
+const handleDelete = (id: string) => {
+  DeleteClient(id);
 
-      reloadTable();
-    },
-    onCancel() {
-      console.log('Cancel');
-    },
-  });
-  console.log('record', Id);
+  reloadTable();
 };
 
 const handleOk = async () => {
@@ -247,12 +236,8 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
 // });
 </script>
 <template>
-  <div class="p-5">
-    <a-page-header
-      style="border: 1px solid rgb(235 237 240)"
-      sub-title="Client list page"
-      title="Clients"
-    />
+  <div style="overflow-y: scroll">
+    <a-page-header sub-title="Client list page" title="Clients" />
     <a-form ref="searchForm" :model="searchModel" layout="inline">
       <a-form-item label="ClientId">
         <a-input v-model:value="searchModel.ClientId" placeholder="ClientId" />
@@ -301,17 +286,46 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
               Edit
             </a-button>
             <Divider type="vertical" />
-            <a-button
-              :icon="h(DeleteOutlined)"
-              danger
-              @click="handleDelete(record.Id)"
+            <a-popconfirm
+              title="Delete Client  "
+              @confirm="handleDelete(record.id)"
             >
-              Delete
-            </a-button>
+              <a-button :icon="h(DeleteOutlined)" danger>Delete</a-button>
+            </a-popconfirm>
           </a-space>
         </template>
         <template v-else-if="column.key === 'Enabled'">
-          <a-checkbox v-model:checked="record.Enabled" />
+          <a-switch
+            v-model:checked="record.Enabled"
+            enabled="false"
+            size="small"
+          />
+        </template>
+        <template v-else-if="column.key === 'Scopes'">
+          <a-space size="small" wrap>
+            <a-tag
+              v-for="sc in record.Scopes.split(' ')"
+              :key="sc"
+              color="blue"
+            >
+              {{ sc }}
+            </a-tag>
+          </a-space>
+        </template>
+        <template v-else-if="column.key === 'GrantTypes'">
+          <a-space size="small" wrap>
+            <a-tag
+              v-for="gt in record.GrantTypes.split(' ')"
+              :key="gt"
+              color="geekblue"
+            >
+              {{
+                gt === 'urn:ietf:params:oauth:grant-type:device_code'
+                  ? 'device code'
+                  : gt
+              }}
+            </a-tag>
+          </a-space>
         </template>
       </template>
     </a-table>

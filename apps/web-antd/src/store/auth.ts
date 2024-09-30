@@ -4,7 +4,7 @@ import type { UserInfo } from '@vben/types';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { DEFAULT_HOME_PATH, LOGIN_PATH } from '@vben/constants';
+import { DEFAULT_HOME_PATH } from '@vben/constants';
 import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 
 import { notification } from 'ant-design-vue';
@@ -81,16 +81,20 @@ export const useAuthStore = defineStore('auth', () => {
     //   await logoutApi();
     resetAllStores();
     accessStore.setLoginExpired(false);
+    if (redirect === true) {
+      const um = new UserManager(oidcSetting);
+      um.signoutRedirect();
+    }
 
     // 回登陆页带上当前路由地址
-    await router.replace({
-      path: LOGIN_PATH,
-      query: redirect
-        ? {
-            redirect: encodeURIComponent(router.currentRoute.value.fullPath),
-          }
-        : {},
-    });
+    // await router.replace({
+    //   path: LOGIN_PATH,
+    //   query: redirect
+    //     ? {
+    //         redirect: encodeURIComponent(router.currentRoute.value.fullPath),
+    //       }
+    //     : {},
+    // });
   }
 
   async function fetchUserInfo() {

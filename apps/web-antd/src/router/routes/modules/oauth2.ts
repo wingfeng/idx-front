@@ -6,20 +6,20 @@ const routes: RouteRecordRaw[] = [
   {
     component: BasicLayout,
     meta: {
-      badgeType: 'dot',
-      icon: 'ic:baseline-view-in-ar',
+      icon: 'oui:app-management',
       order: 9999,
       title: 'Manage',
     },
     name: 'OAuth2',
     path: '/oauth2-admin',
+
     children: [
       {
         name: 'Clients',
         path: 'clientlist',
         component: () => import('#/views/oauth2/clients/ClientList.vue'),
         meta: {
-          icon: 'lucide:copyright',
+          icon: 'mdi:application-brackets-outline',
           title: 'Clients',
         },
       },
@@ -28,7 +28,7 @@ const routes: RouteRecordRaw[] = [
         path: 'apis',
         component: () => import('#/views/oauth2/apis/APIList.vue'),
         meta: {
-          icon: 'lucide:book-open-text',
+          icon: 'lucide:code-2',
 
           title: 'APIs',
         },
@@ -36,9 +36,9 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Organization Unit',
         path: 'ou',
-        component: () => import('#/views/oauth2/apis/APIList.vue'),
+        component: () => import('#/views/oauth2/users/OUList.vue'),
         meta: {
-          icon: 'mdi:github',
+          icon: 'clarity:organization-line',
 
           title: 'Organization Unit',
         },
@@ -46,20 +46,18 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Groups',
         path: 'Groups',
-        component: () => import('#/views/oauth2/apis/APIList.vue'),
+        component: () => import('#/views/oauth2/users/GroupList.vue'),
         meta: {
-          badgeType: 'dot',
-
           title: 'Groups',
+          icon: 'lucide:users-2',
         },
       },
       {
         name: 'Users',
         path: 'users',
-        component: () => import('#/views/oauth2/apis/APIList.vue'),
+        component: () => import('#/views/oauth2/users/UserList.vue'),
         meta: {
-          badgeType: 'dot',
-
+          icon: 'mdi:user',
           title: 'Users',
         },
       },
