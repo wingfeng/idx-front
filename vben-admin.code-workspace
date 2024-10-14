@@ -5,7 +5,7 @@
       "path": "apps/backend-mock",
     },
     {
-      "name": "idx-web-antd",
+      "name": "adminui",
       "path": "apps/web-antd",
     },
     {

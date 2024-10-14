@@ -102,14 +102,16 @@ const {
   current,
   pageSize,
 } = usePagination(GetClientsPage, {
-  defaultParams: {
-    page: 1,
-    pageSize: 10,
-    sortField: 'id',
-    sortOrder: 'asc',
-    filters,
-    args,
-  },
+  defaultParams: [
+    {
+      page: 1,
+      pageSize: 10,
+      sortField: 'id',
+      sortOrder: 'asc',
+      filters,
+      args,
+    },
+  ],
   pagination: {
     currentKey: 'page',
     pageSizeKey: 'pageSize',
@@ -129,15 +131,6 @@ const pagination = computed(() => ({
 }));
 
 const reloadTable = () => {
-  // setTimeout(() => {
-  //   run({
-  //     page: current.value,
-  //     pageSize: pageSize.value,
-  //     sortField: sortField.value,
-  //     sortOrder: sortOrder.value,
-  //     filter,
-  //   });
-  // }, 500);
   setTimeout(() => {
     refresh();
   }, 50);
@@ -231,9 +224,6 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
     filter: filters,
   });
 };
-// onMounted(() => {
-//   reloadTable();
-// });
 </script>
 <template>
   <div style="overflow-y: scroll">
