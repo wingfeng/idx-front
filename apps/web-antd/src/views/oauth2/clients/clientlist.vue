@@ -27,13 +27,13 @@ const columns = [
   },
   {
     title: 'Enabled',
-    dataIndex: 'Enabled',
+    dataIndex: 'enabled',
     key: 'Enabled',
     sorter: true,
   },
   {
     title: 'ClientName',
-    dataIndex: 'ClientName',
+    dataIndex: 'clientName',
     key: 'ClientName',
     name: 'client_name',
     sorter: true,
@@ -41,21 +41,21 @@ const columns = [
   },
   {
     title: 'ClientId',
-    dataIndex: 'ClientId',
+    dataIndex: 'clientId',
     key: 'client_id',
     sorter: true,
     filtered: true,
   },
   {
     title: 'Scopes',
-    dataIndex: 'Scopes',
+    dataIndex: 'scopes',
     key: 'Scopes',
     sorter: true,
     filtered: true,
   },
   {
     title: 'GrantTypes',
-    dataIndex: 'GrantTypes',
+    dataIndex: 'grantTypes',
     key: 'GrantTypes',
     sorter: true,
     filtered: true,
@@ -286,7 +286,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
         </template>
         <template v-else-if="column.key === 'Enabled'">
           <a-switch
-            v-model:checked="record.Enabled"
+            v-model:checked="record.enabled"
             enabled="false"
             size="small"
           />
@@ -294,7 +294,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
         <template v-else-if="column.key === 'Scopes'">
           <a-space size="small" wrap>
             <a-tag
-              v-for="sc in record.Scopes.split(' ')"
+              v-for="sc in record.scopes.split(' ')"
               :key="sc"
               color="blue"
             >
@@ -305,7 +305,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
         <template v-else-if="column.key === 'GrantTypes'">
           <a-space size="small" wrap>
             <a-tag
-              v-for="gt in record.GrantTypes.split(' ')"
+              v-for="gt in record.grantTypes.split(' ')"
               :key="gt"
               color="geekblue"
             >

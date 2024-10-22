@@ -20,9 +20,9 @@ import { DeleteUser, GetUserPage, ResetPassword, SaveUser } from '#/store/user';
 import UserForm from './UserForm.vue';
 
 const fieldNames = {
-  title: 'text',
-  key: 'id',
-  children: 'nodes',
+  title: 'DisplayName',
+  key: 'Id',
+  children: 'Children',
 };
 const expandedKeys = ref<string[]>([]);
 const selectedKeys = ref<string[]>([]);
@@ -34,9 +34,10 @@ onMounted(() => {
   return getOUTree('')
     .then((res) => {
       console.log('treeData', res);
-      treeData.value = res;
-      orgTree.value = res[0];
-      selectedKeys.value.push(res[0].id);
+      const items = res.items;
+      treeData.value = items;
+      orgTree.value = items[0];
+      selectedKeys.value.push(items[0].Id);
       console.log('selected Key', selectNode.value);
     })
     .catch((error) => {
@@ -47,15 +48,15 @@ onMounted(() => {
 const columns = [
   {
     title: 'Id',
-    dataIndex: 'id',
-    key: 'id',
+    dataIndex: 'Id',
+    key: 'Id',
     sorter: true,
     defaultSortOrder: 'ascend',
   },
 
   {
     title: 'Account',
-    dataIndex: 'account',
+    dataIndex: 'Account',
     key: 'account',
     name: 'account',
     sorter: true,
@@ -155,6 +156,7 @@ const {
   },
 });
 const fieldMap = {
+  Id: 'id',
   displayname: 'display_name',
   lockoutenabled: 'lockout_enabled',
 };
@@ -215,13 +217,13 @@ const handleDelete = (Id: string) => {
 };
 const showNewPwd = ref<boolean>(false);
 const newPwd = ref<string>('');
-const handleResetpassword = async (username: string) => {
-  ResetPassword(username).then((pwd) => {
+const handleResetpassword = async (Id: number, userName: string) => {
+  ResetPassword(Id).then((pwd) => {
     Modal.warning({
       title: `Password only show once`,
       content: h('div', {}, [
-        h('p', {}, `user ${username} password resetted to`),
-        h(Tag, { color: 'red' }, `${pwd}`),
+        h('p', {}, `user ${userName} password is resetted to`),
+        h(Tag, { color: 'red' }, `${pwd.NewPwd}`),
       ]),
       onOk() {
         reloadTable();
@@ -365,7 +367,7 @@ const onTableChange = (pagination: any, filter: any, sorters: any) => {
                 <a-popconfirm
                   placement="right"
                   title="Reset Password"
-                  @confirm="handleResetpassword(record.account)"
+                  @confirm="handleResetpassword(record.Id, record.Account)"
                 >
                   <a-button :icon="h(RollbackOutlined)" danger />
                 </a-popconfirm>

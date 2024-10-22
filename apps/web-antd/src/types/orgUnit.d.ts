@@ -2,28 +2,31 @@ export interface OrgUnitInfo {
   /**
    * 唯一标识
    */
-  id: bigint;
+  Id: bigint;
   /**
    * 名称
    */
-  name: string;
+  Name: string;
   /**
    * 显示名称
    */
-  displayname: string;
+  Displayname: string;
   /**
    * 父节点
    */
-  parentId?: bigint;
+  ParentId?: bigint;
   /**
    * 父节点名称
    */
-  parentName: string;
+  ParentName: string;
   /**
    * 描述
    */
-  description: string;
+  Description: string;
   /**
    * 排序
    */
+}
+export interface OrgTreeResponse {
+  items: Array<OrgUnitInfo>;
 }

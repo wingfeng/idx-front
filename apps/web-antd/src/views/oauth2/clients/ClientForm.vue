@@ -30,10 +30,10 @@ const scopeOptions = [
 ];
 const scopes = computed({
   get() {
-    return model.value.Scopes.split(' ');
+    return model.value.scopes.split(' ');
   },
   set(newVal) {
-    model.value.Scopes = newVal.join(' ');
+    model.value.scopes = newVal.join(' ');
   },
 });
 
@@ -61,28 +61,28 @@ const grantTypesOptions = computed(() => {
 });
 const grantTypes = computed({
   get() {
-    return model.value.GrantTypes.split(' ');
+    return model.value.grantTypes.split(' ');
   },
   set(newVal) {
-    model.value.GrantTypes = newVal.join(' ');
+    model.value.grantTypes = newVal.join(' ');
   },
 });
 const redirectUris = computed({
   get() {
-    const array = model.value.RedirectUris
-      ? model.value.RedirectUris.split(' ')
+    const array = model.value.redirectUris
+      ? model.value.redirectUris.split(' ')
       : [];
     return array.join('\n');
   },
   set(newVal) {
     const array = newVal.split('\n');
-    model.value.RedirectUris = array.join(' ');
+    model.value.redirectUris = array.join(' ');
   },
 });
 const labelCol = { style: { width: '150px' } };
 const wrapperCol = { span: 14 };
 const rules: Record<string, Rule[]> = {
-  ClientName: [
+  clientName: [
     {
       required: true,
       message: 'Please input Client name',
@@ -90,7 +90,7 @@ const rules: Record<string, Rule[]> = {
     },
     { min: 3, max: 25, message: 'Length should be 3 to 25', trigger: 'blur' },
   ],
-  ClientId: [
+  clientId: [
     {
       required: true,
       message: 'Please input Client Id',
@@ -98,7 +98,7 @@ const rules: Record<string, Rule[]> = {
     },
     { min: 3, max: 25, message: 'Length should be 3 to 25', trigger: 'blur' },
   ],
-  Scopes: [
+  scopes: [
     {
       required: true,
       message: 'Scopes cannot be empty',
@@ -106,7 +106,7 @@ const rules: Record<string, Rule[]> = {
     },
   ],
 
-  GrantTypes: [
+  grantTypes: [
     {
       required: true,
       message: 'GrantTypes cannot be empty',
@@ -117,10 +117,10 @@ const rules: Record<string, Rule[]> = {
 defineExpose({ validate, resetForm, model });
 // Claims
 const claims = computed(() => {
-  if (model.value.Claims === undefined || model.value.Claims === null) {
+  if (model.value.claims === undefined || model.value.claims === null) {
     return [];
   }
-  const obj = model.value.Claims;
+  const obj = model.value.claims;
   const tmpArray = Object.entries(obj);
   const result: any[] = [];
   let i = 1;
@@ -136,10 +136,10 @@ const claims = computed(() => {
 });
 const newClaims = () => {
   console.log('newClaims', model.value);
-  if (model.value.Claims === undefined || model.value.Claims === null) {
-    model.value.Claims = {};
+  if (model.value.claims === undefined || model.value.claims === null) {
+    model.value.claims = {};
   }
-  model.value.Claims.NewClaims = 'Value';
+  model.value.claims.NewClaims = 'Value';
 };
 const editableData: UnwrapRef<Record<string, any>> = reactive({});
 const columns = [
@@ -168,14 +168,14 @@ const save = (key: number) => {
   const originName = claims.value.find((item) => item.id === key).Name;
   const item = editableData[key];
   if (originName !== item.Name) {
-    delete model.value.Claims[originName];
+    delete model.value.claims[originName];
   }
 
-  model.value.Claims[item.Name] = item.Value;
+  model.value.claims[item.Name] = item.Value;
   delete editableData[key];
 };
 const remove = (key: string) => {
-  delete model.value.Claims[claims.value.find((item) => key === item.id).Name];
+  delete model.value.claims[claims.value.find((item) => key === item.id).Name];
 };
 const cancel = (key: string) => {
   delete editableData[key];
@@ -195,35 +195,35 @@ const cancel = (key: string) => {
           <label>{{ model.id }}</label>
         </a-form-item>
         <a-form-item label="Enabled">
-          <a-checkbox v-model:checked="model.Enabled" />
+          <a-checkbox v-model:checked="model.enabled" />
         </a-form-item>
 
-        <a-form-item label="Client name" name="ClientName" required>
-          <a-input v-model:value="model.ClientName" />
+        <a-form-item label="Client name" name="clientName" required>
+          <a-input v-model:value="model.clientName" />
         </a-form-item>
-        <a-form-item label="Client Id" name="ClientId" required>
-          <a-input v-model:value="model.ClientId" />
+        <a-form-item label="Client Id" name="clientId" required>
+          <a-input v-model:value="model.clientId" />
         </a-form-item>
         <a-form-item label=" ">
-          <a-checkbox v-model:checked="model.RequireConsent">
+          <a-checkbox v-model:checked="model.requireConsent">
             Require consent
           </a-checkbox>
-          <a-checkbox v-model:checked="model.RequireSecret">
+          <a-checkbox v-model:checked="model.requireSecret">
             Require Secret
           </a-checkbox>
-          <a-checkbox v-model:checked="model.RequirePkce">
+          <a-checkbox v-model:checked="model.requirePkce">
             Require PKCE
           </a-checkbox>
         </a-form-item>
         <a-form-item label="Client Url">
-          <a-input v-model:value="model.ClientURI" />
+          <a-input v-model:value="model.clientURI" />
         </a-form-item>
         <a-form-item label="Client Logo Url">
-          <a-image :src="client.LogoURI" height="32px" width="32px" />
-          <a-input v-model:value="model.LogoURI" />
+          <a-image :src="client.logoURI" height="32px" width="32px" />
+          <a-input v-model:value="model.logoURI" />
         </a-form-item>
         <a-form-item label="Description">
-          <a-textarea v-model:value="model.Description" />
+          <a-textarea v-model:value="model.description" />
         </a-form-item>
         <a-form-item label="Grant types" name="GrantTypes">
           <a-select

@@ -1,18 +1,18 @@
 export interface ClientInfo {
-  Id: number;
-  Enabled: boolean;
-  ClientId: string;
-  ClientName: string;
-  ClientURI?: string;
-  Description?: string;
-  Scopes: string;
-  GrantTypes: string;
-  RedirectUris?: string;
-  RequireConsent: boolean;
-  RequirePkce: boolean;
-  RequireSecret: boolean;
-  LogoURI?: string;
-  Claims: any;
+  id: number;
+  enabled: boolean;
+  clientId: string;
+  clientName: string;
+  clientURI?: string;
+  description?: string;
+  scopes: string;
+  grantTypes: string;
+  redirectUris?: string;
+  requireConsent: boolean;
+  requirePkce: boolean;
+  requireSecret: boolean;
+  logoURI?: string;
+  claims: any;
 }
 
 export interface ClientSecretInfo {
@@ -26,4 +26,7 @@ export interface GenSecretParam {
   client_id: string;
   name?: string;
   expiration?: Date;
+}
+export interface GetSecretResponse {
+  Secrets: Array<ClientSecretInfo>;
 }

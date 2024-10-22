@@ -88,11 +88,11 @@ defineExpose({ validate, resetForm, model });
     :wrapper-col="wrapperCol"
   >
     <a-form-item label="Id">
-      <label>{{ model.id }}</label>
+      <label>{{ model.Id }}</label>
     </a-form-item>
 
     <a-form-item label="Account" name="account" required>
-      <a-input v-model:value="model.account" />
+      <a-input v-model:value="model.Account" />
     </a-form-item>
     <a-form-item label="Organization" name="ou">
       <a-tree-select
@@ -104,19 +104,19 @@ defineExpose({ validate, resetForm, model });
       />
     </a-form-item>
     <a-form-item label="Email" name="email" required>
-      <a-input v-model:value="model.email" />
+      <a-input v-model:value="model.Email" />
     </a-form-item>
     <a-form-item label="DisplayName" name="displayname" required>
-      <a-input v-model:value="model.displayname" />
+      <a-input v-model:value="model.DisplayName" />
     </a-form-item>
     <a-form-item label="Phone Number" name="PhoneNumber">
-      <a-input v-model:value="model.phonenumber" type="number" />
+      <a-input v-model:value="model.PhoneNumber" type="number" />
     </a-form-item>
     <a-form-item label="Locked" name="Locked">
-      <a-switch v-model:checked="model.lockoutenabled" />
+      <a-switch v-model:checked="model.LockoutEnabled" />
     </a-form-item>
     <a-form-item label="Temporary Password" name="Temporary">
-      <a-switch v-model:checked="model.istemporarypassword" />
+      <a-switch v-model:checked="model.IsTemporaryPassword" />
     </a-form-item>
   </a-form>
 </template>

@@ -4,14 +4,14 @@ import { computed, onMounted, ref } from 'vue';
 import { getOUTree } from '#/api/system/ou';
 
 const selectFieldNames = {
-  label: 'text',
-  value: 'id',
-  children: 'nodes',
+  label: 'DisplayName',
+  value: 'Id',
+  children: 'Children',
 };
 const fieldNames = {
-  title: 'text',
-  key: 'id',
-  children: 'nodes',
+  title: 'DisplayName',
+  key: 'Id',
+  children: 'Children',
 };
 const expandedKeys = ref<string[]>([]);
 const selectedKeys = ref<string[]>([]);
@@ -21,7 +21,7 @@ onMounted(() => {
   return getOUTree('')
     .then((res) => {
       console.log('res', res);
-      treeData.value = res;
+      treeData.value = res.items;
     })
     .catch((error) => {
       console.log('err', error);
@@ -71,7 +71,7 @@ const onSelect = (treeNode: any, e: any) => {
         </a-form-item>
         <a-form-item label="Parent">
           <a-tree-select
-            v-model:value="selectNode.parentId"
+            v-model:value="selectNode.ParentId"
             :field-names="selectFieldNames"
             :tree-data="treeData"
             placeholder="Please select an parent"
@@ -80,19 +80,19 @@ const onSelect = (treeNode: any, e: any) => {
         </a-form-item>
         <a-form-item label="Name">
           <a-input
-            v-model:value="selectNode.name"
+            v-model:value="selectNode.Name"
             placeholder="Please enter name"
           />
         </a-form-item>
         <a-form-item label="Displayname">
           <a-input
-            v-model:value="selectNode.text"
+            v-model:value="selectNode.Displayname"
             placeholder="Please enter Displayname"
           />
         </a-form-item>
         <a-form-item label="Sort Order">
           <a-input
-            v-model:value="selectNode.sortorder"
+            v-model:value="selectNode.SortOrder"
             placeholder="Please enter soft order"
             type="number"
           />

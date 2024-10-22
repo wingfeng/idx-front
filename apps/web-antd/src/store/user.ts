@@ -19,6 +19,6 @@ export async function SaveUser(data: any) {
 export async function DeleteUser(id: string) {
   return delUser(id);
 }
-export async function ResetPassword(username: string) {
-  return resetPassword(username);
+export async function ResetPassword(Id: number) {
+  return resetPassword(Id);
 }

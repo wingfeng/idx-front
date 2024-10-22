@@ -1,7 +1,7 @@
 <script lang="ts" setup name="Secret">
 import type { GenSecretParam } from '#/types/client';
 
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRequest } from 'vue-request';
 
 import { DeleteOutlined } from '@ant-design/icons-vue';
@@ -17,6 +17,7 @@ const props = defineProps<{
 const { data, run, refresh, loading } = useRequest(getSecrets, {
   defaultParams: [props.clientId],
 });
+const secrets = computed(() => data.value?.Secrets);
 const handleDelete = async (id: number) => {
   await delSecret(id);
   refresh();
@@ -33,7 +34,8 @@ const openGen = ref(false);
 const onGenerate = async () => {
   try {
     console.log(genParam);
-    newSecret.value = await generateSecret(genParam.value);
+    const newSeq = await generateSecret(genParam.value);
+    newSecret.value = newSeq.Secret;
     genParam.value.name = '';
     console.log(`new secret:${newSecret.value}`);
     refresh();
@@ -67,14 +69,14 @@ watch(
     <a-tag color="warning">{{ newSecret }}</a-tag> copy it before you close this
     dialog
   </div>
-  <a-list :data-source="data" :loading="loading" item-layout="horizontal">
+  <a-list :data-source="secrets" :loading="loading" item-layout="horizontal">
     <template #renderItem="{ item }">
       <a-list-item>
         <a-list-item-meta>
           <template #description>
             Expired at: {{ formatDate(item.Expiration) }}
           </template>
-          <template #title> {{ item.id }} {{ item.Name }} </template>
+          <template #title> {{ item.id }} {{ item.name }} </template>
         </a-list-item-meta>
         <template #actions>
           <a-popconfirm
@@ -96,8 +98,8 @@ watch(
     @ok="onGenerate"
   >
     <a-form>
-      <a-form-item label="Description">
-        <a-input v-model:value="genParam.name" />
+      <a-form-item label="Name">
+        <a-input v-model:value="genParam.name" aria-required="true" />
       </a-form-item>
       <a-form-item label="Expiration">
         <a-date-picker v-model:value="genParam.expiration" />

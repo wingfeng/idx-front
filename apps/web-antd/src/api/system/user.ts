@@ -5,11 +5,11 @@ import type { UserInfo } from '#/types/user';
 import { requestClient } from '#/api/request';
 
 const apiURL: any = {
-  Page: '/api/v1/system/user/page',
-  Get: '/api/v1/system/user/get',
+  Page: '/api/v1/system/user/list',
+  Get: '/api/v1/system/user/',
   PUT: '/api/v1/system/user',
-  Delete: '/api/v1/system/user/del',
-  RESETPASSWORD: '/api/v1/system/user/resetpassword',
+  Delete: '/api/v1/system/user/',
+  RESETPASSWORD: '/api/v1/system/user/resetpwd',
 };
 
 export async function getUserList(params: PageParams) {
@@ -20,23 +20,17 @@ export async function getUserList(params: PageParams) {
 }
 
 export async function getUser(id: string) {
-  return requestClient.get<APIResult<UserInfo>>(apiURL.Get, {
-    params: { id },
-  });
+  return requestClient.get<APIResult<UserInfo>>(apiURL.Get + id);
 }
 export async function delUser(id: string) {
-  return requestClient.delete<APIResult<UserInfo>>(apiURL.Delete, {
-    params: {
-      id,
-    },
-  });
+  return requestClient.delete<APIResult<UserInfo>>(apiURL.Delete + id);
 }
 export async function saveUser(info: UserInfo) {
   return requestClient.put<APIResult<UserInfo>>(apiURL.PUT, info);
 }
 
-export async function resetPassword(username: string) {
+export async function resetPassword(Id: number) {
   return requestClient.post<APIResult<string>>(apiURL.RESETPASSWORD, {
-    username,
+    Id,
   });
 }
