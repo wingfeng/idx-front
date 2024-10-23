@@ -11,16 +11,20 @@ export interface ClientInfo {
   requireConsent: boolean;
   requirePkce: boolean;
   requireSecret: boolean;
+  allowOfflineAccess: boolean;
+  alwaysIncludeUserClaimsInIdToken: boolean;
+  allowRememberConsent: boolean;
+  allowPlainTextPkce: boolean;
   logoURI?: string;
   claims: any;
 }
 
 export interface ClientSecretInfo {
   id: number;
-  ClientId: number;
-  Name: string;
-  Expiration: Date;
-  Value: string;
+  clientId: number;
+  name: string;
+  expiration: Date;
+  value: string;
 }
 export interface GenSecretParam {
   client_id: string;

@@ -2,27 +2,27 @@ export interface OrgUnitInfo {
   /**
    * 唯一标识
    */
-  Id: bigint;
+  id: bigint;
   /**
    * 名称
    */
-  Name: string;
+  name: string;
   /**
    * 显示名称
    */
-  Displayname: string;
+  displayName: string;
   /**
    * 父节点
    */
-  ParentId?: bigint;
+  parentId?: bigint;
   /**
    * 父节点名称
    */
-  ParentName: string;
+  parentName: string;
   /**
    * 描述
    */
-  Description: string;
+  description: string;
   /**
    * 排序
    */

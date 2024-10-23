@@ -214,6 +214,15 @@ const cancel = (key: string) => {
           <a-checkbox v-model:checked="model.requirePkce">
             Require PKCE
           </a-checkbox>
+          <a-checkbox v-model:checked="model.allowRememberConsent">
+            Allow Remember Concent
+          </a-checkbox>
+          <a-checkbox v-model:checked="model.alwaysIncludeUserClaimsInIdToken">
+            Always Include user claims in dToken
+          </a-checkbox>
+          <a-checkbox v-model:checked="model.allowPlainTextPkce">
+            Allow Plain Text Pkce
+          </a-checkbox>
         </a-form-item>
         <a-form-item label="Client Url">
           <a-input v-model:value="model.clientURI" />

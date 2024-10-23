@@ -2,58 +2,58 @@ export interface UserInfo {
   /**
    * 组织ID
    */
-  OuId: string;
+  ouId: string;
   /*
    *组织
    */
-  Ou: string;
+  ou: string;
   /**
    * 用户名
    */
-  Account: string;
+  account?: string;
 
   /**
    * 角色
    */
-  roles: string[];
+  roles?: string[];
   /**
    * 真实姓名
    */
-  Displayname: string;
+  displayName?: string;
   /**
    * 用户ID
    */
-  Id: string;
+  id?: string;
   /**
    * 锁定次数
    */
-  AccessFailedCount: number;
+  accessFailedCount?: number;
   /**
    * 手机号
    */
-  PhoneNumber: string;
+  phoneNumber?: string;
   /**
    * 邮箱
    */
-  Email: string;
+  email?: string;
   /**
    * 邮箱是否确认
    */
-  EmailConfirmed: boolean;
+  emailConfirmed?: boolean;
   /**
    * 手机号是否确认
    */
-  PhoneNumberConfirmed: boolean;
+  phoneNumberConfirmed?: boolean;
   /**
    * 是否锁定
    */
-  LockoutEnabled: boolean;
+  lockoutEnabled?: boolean;
   /**
    * 锁定时间
    */
-  LockoutEnd: Date;
+  lockoutEnd?: Date;
   /**
    * 密码是否为临时密码
    */
-  IsTemporaryPassword: boolean;
+  isTemporaryPassword?: boolean;
 }

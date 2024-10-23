@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { SortOrder } from '#/types/page';
 import type { UserInfo } from '#/types/user';
 
 import { computed, h, onMounted, ref } from 'vue';
@@ -20,9 +21,9 @@ import { DeleteUser, GetUserPage, ResetPassword, SaveUser } from '#/store/user';
 import UserForm from './UserForm.vue';
 
 const fieldNames = {
-  title: 'DisplayName',
-  key: 'Id',
-  children: 'Children',
+  title: 'displayName',
+  key: 'id',
+  children: 'children',
 };
 const expandedKeys = ref<string[]>([]);
 const selectedKeys = ref<string[]>([]);
@@ -38,7 +39,6 @@ onMounted(() => {
       treeData.value = items;
       orgTree.value = items[0];
       selectedKeys.value.push(items[0].Id);
-      console.log('selected Key', selectNode.value);
     })
     .catch((error) => {
       console.log('err', error);
@@ -48,7 +48,7 @@ onMounted(() => {
 const columns = [
   {
     title: 'Id',
-    dataIndex: 'Id',
+    dataIndex: 'id',
     key: 'Id',
     sorter: true,
     defaultSortOrder: 'ascend',
@@ -56,7 +56,7 @@ const columns = [
 
   {
     title: 'Account',
-    dataIndex: 'Account',
+    dataIndex: 'account',
     key: 'account',
     name: 'account',
     sorter: true,
@@ -64,8 +64,8 @@ const columns = [
   },
   {
     title: 'Displayname',
-    dataIndex: 'displayname',
-    key: 'displayname',
+    dataIndex: 'displayName',
+    key: 'displayName',
     sorter: true,
     filtered: true,
   },
@@ -84,14 +84,14 @@ const columns = [
   },
   {
     title: 'Lock Out',
-    dataIndex: 'lockoutenabled',
-    key: 'lockoutenabled',
+    dataIndex: 'lockoutEnabled',
+    key: 'lockoutEnabled',
     sorter: true,
   },
   {
     title: 'Temporary Password',
-    dataIndex: 'istemporarypassword',
-    key: 'istemporarypassword',
+    dataIndex: 'isTemporaryPassword',
+    key: 'isTemporaryPassword',
     sorter: true,
   },
   {
@@ -105,9 +105,9 @@ const searchModel = ref({
   Account: '',
   Displayname: '',
 });
-const sortField = ref('Id');
+const sortField = ref('id');
 const sortOrder = ref('asc');
-const filters = computed(() => {
+const filters = computed<Array<string>>(() => {
   const tmp = [];
   if (searchModel.value.Account !== '') {
     tmp.push(`account like ?`);
@@ -115,20 +115,21 @@ const filters = computed(() => {
   if (searchModel.value.Displayname !== '') {
     tmp.push(`display_name like ?`);
   }
-  if (selectedKeys.value.length > 0) {
+
+  if (selectedKeys.value.length > 0 && selectedKeys.value[0] !== undefined) {
     tmp.push(`ou_id = ?`);
   }
   return tmp;
 });
-const args: Array<string> = computed(() => {
-  const tmp = [];
+const args = computed<Array<string>>(() => {
+  const tmp: string[] = [];
   if (searchModel.value.Account !== '') {
     tmp.push(`%${searchModel.value.Account}%`);
   }
   if (searchModel.value.Displayname !== '') {
     tmp.push(`%${searchModel.value.Displayname}%`);
   }
-  if (selectedKeys.value.length > 0) {
+  if (selectedKeys.value.length > 0 && selectedKeys.value[0] !== undefined) {
     tmp.push(selectedKeys.value[0]);
   }
   return tmp;
@@ -142,14 +143,16 @@ const {
   current,
   pageSize,
 } = usePagination(GetUserPage, {
-  defaultParams: {
-    page: 1,
-    pageSize: 10,
-    sortField: 'Id',
-    sortOrder: 'asc',
-    filters,
-    args,
-  },
+  defaultParams: [
+    {
+      page: 1,
+      pageSize: 10,
+      sortField: 'id',
+      sortOrder: 'asc' as SortOrder,
+      filters: filters.value,
+      args: args.value,
+    },
+  ],
   pagination: {
     currentKey: 'page',
     pageSizeKey: 'pageSize',
@@ -176,8 +179,12 @@ const onSelect = (treeNode: any, e: any) => {
   // console.log('selected node', e);
   selectNode.value = e.node.dataRef;
   run({
-    filters,
-    args,
+    page: current.value,
+    pageSize: pageSize.value,
+    sortField: sortField.value,
+    sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+    filters: filters.value,
+    args: args.value,
   });
   console.log('selected node', selectNode.value);
 };
@@ -188,9 +195,9 @@ const handleSearch = () => {
       page: current.value,
       pageSize: pageSize.value,
       sortField: sortField.value,
-      sortOrder: sortOrder.value,
-      filters,
-      args,
+      sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+      filters: filters.value,
+      args: args.value,
     });
   }, 500);
 };
@@ -200,7 +207,16 @@ const handleReset = () => {
     Displayname: '',
   };
   searchForm.value.resetFields();
-  reloadTable();
+  setTimeout(() => {
+    run({
+      page: current.value,
+      pageSize: pageSize.value,
+      sortField: sortField.value,
+      sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+      filters: filters.value,
+      args: args.value,
+    });
+  }, 500);
 };
 const open = ref<boolean>(false);
 const row = ref<UserInfo>();
@@ -254,8 +270,8 @@ const handleNew = async () => {
   const resp = await newId();
   row.value = {
     id: resp.id,
-    ou: selectNode.value.text,
-    ouid: selectNode.value.id,
+    ou: selectNode.value.name,
+    ouId: selectNode.value.id,
   };
   open.value = true;
 };
@@ -277,7 +293,7 @@ const onTableChange = (pagination: any, filter: any, sorters: any) => {
     page: current.value,
     pageSize: pageSize.value,
     sortField: sortField.value,
-    sortOrder: sortOrder.value,
+    sortOrder: SortOrder[sortOrder.value],
     filters,
     args,
   });
@@ -367,19 +383,19 @@ const onTableChange = (pagination: any, filter: any, sorters: any) => {
                 <a-popconfirm
                   placement="right"
                   title="Reset Password"
-                  @confirm="handleResetpassword(record.Id, record.Account)"
+                  @confirm="handleResetpassword(record.id, record.account)"
                 >
                   <a-button :icon="h(RollbackOutlined)" danger />
                 </a-popconfirm>
               </a-tooltip>
             </a-space>
           </template>
-          <template v-else-if="column.key === 'lockoutenabled'">
-            <a-switch v-model:checked="record.lockoutenabled" size="small" />
+          <template v-else-if="column.key === 'lockoutEnabled'">
+            <a-switch v-model:checked="record.lockoutEnabled" size="small" />
           </template>
-          <template v-else-if="column.key === 'istemporarypassword'">
+          <template v-else-if="column.key === 'isTemporaryPassword'">
             <a-switch
-              v-model:checked="record.istemporarypassword"
+              v-model:checked="record.isTemporaryPassword"
               size="small"
             />
           </template>

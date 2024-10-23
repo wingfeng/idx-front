@@ -1,5 +1,10 @@
+enum SortOrder {
+  Asc = 'asc',
+  Desc = 'desc',
+}
+
 export type PageResult<T> = {
-  list: T[];
+  list: Array<T>;
   page: number;
   pageSize: number;
   total: number;
@@ -10,5 +15,5 @@ export type PageParams = {
   page: number;
   pageSize: number;
   sortField?: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: SortOrder;
 };

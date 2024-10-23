@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { ClientInfo } from '#/types/client';
+import type { SortOrder } from '#/types/page';
 
 import { computed, h, ref } from 'vue';
 import { usePagination } from 'vue-request';
@@ -28,13 +29,13 @@ const columns = [
   {
     title: 'Enabled',
     dataIndex: 'enabled',
-    key: 'Enabled',
+    key: 'enabled',
     sorter: true,
   },
   {
     title: 'ClientName',
     dataIndex: 'clientName',
-    key: 'ClientName',
+    key: 'clientName',
     name: 'client_name',
     sorter: true,
     filtered: true,
@@ -49,14 +50,14 @@ const columns = [
   {
     title: 'Scopes',
     dataIndex: 'scopes',
-    key: 'Scopes',
+    key: 'scopes',
     sorter: true,
     filtered: true,
   },
   {
     title: 'GrantTypes',
     dataIndex: 'grantTypes',
-    key: 'GrantTypes',
+    key: 'grantTypes',
     sorter: true,
     filtered: true,
   },
@@ -76,14 +77,14 @@ const sortOrder = ref('asc');
 const filters = computed(() => {
   const tmp = [];
   if (searchModel.value.ClientId !== '') {
-    tmp.push(`Client_Id like ?`);
+    tmp.push(`client_Id like ?`);
   }
   if (searchModel.value.ClientName !== '') {
-    tmp.push(`Client_Name like ?`);
+    tmp.push(`client_Name like ?`);
   }
   return tmp;
 });
-const args: Array<string> = computed(() => {
+const args = computed<Array<string>>(() => {
   const tmp = [];
   if (searchModel.value.ClientId !== '') {
     tmp.push(`%${searchModel.value.ClientId}%`);
@@ -107,9 +108,9 @@ const {
       page: 1,
       pageSize: 10,
       sortField: 'id',
-      sortOrder: 'asc',
-      filters,
-      args,
+      sortOrder: 'asc' as SortOrder,
+      filters: filters.value,
+      args: args.value,
     },
   ],
   pagination: {
@@ -191,16 +192,16 @@ const handleCancel = () => {
 };
 const handleNew = () => {
   row.value = {
-    Id: 0,
-    Enabled: true,
-    ClientId: '',
-    ClientName: '',
-    GrantTypes: 'authorization_code',
-    Scopes: 'openid',
-    RequireConsent: true,
-    RequirePkce: false,
-    RequireSecret: true,
-    RedirectUris: 'http://localhost:8080/signin-oidc',
+    id: 0,
+    enabled: true,
+    clientId: '',
+    clientName: '',
+    grantTypes: 'authorization_code',
+    scopes: 'openid',
+    requireConsent: true,
+    requirePkce: false,
+    requireSecret: true,
+    redirectUris: 'http://localhost:8080/signin-oidc',
   };
   open.value = true;
 };
@@ -284,14 +285,14 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
             </a-popconfirm>
           </a-space>
         </template>
-        <template v-else-if="column.key === 'Enabled'">
+        <template v-else-if="column.key === 'enabled'">
           <a-switch
             v-model:checked="record.enabled"
             enabled="false"
             size="small"
           />
         </template>
-        <template v-else-if="column.key === 'Scopes'">
+        <template v-else-if="column.key === 'scopes'">
           <a-space size="small" wrap>
             <a-tag
               v-for="sc in record.scopes.split(' ')"
@@ -302,7 +303,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
             </a-tag>
           </a-space>
         </template>
-        <template v-else-if="column.key === 'GrantTypes'">
+        <template v-else-if="column.key === 'grantTypes'">
           <a-space size="small" wrap>
             <a-tag
               v-for="gt in record.grantTypes.split(' ')"
