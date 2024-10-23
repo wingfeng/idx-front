@@ -118,12 +118,12 @@ const {
     pageSizeKey: 'pageSize',
   },
 });
-const fieldMap = {
-  Id: 'id',
-  ClientName: 'Client_Name',
-  ClientId: 'Client_Id',
-  GrantTypes: 'Grant_Types',
-};
+const fieldMap = new Map<String, string>([
+  ['ClientId', 'Client_Id'],
+  ['ClientName', 'Client_Name'],
+  ['GrantTypes', 'Grant_Types'],
+  ['Id', 'id'],
+]);
 
 const pagination = computed(() => ({
   total: total.value,
@@ -143,9 +143,9 @@ const handleSearch = () => {
       page: current.value,
       pageSize: pageSize.value,
       sortField: sortField.value,
-      sortOrder: sortOrder.value,
-      filters,
-      args,
+      sortOrder: sortOrder.value as SortOrder,
+      filters: filters.value,
+      args: args.value,
     });
   }, 500);
 };
@@ -158,7 +158,22 @@ const handleReset = () => {
   reloadTable();
 };
 const open = ref<boolean>(false);
-const row = ref<ClientInfo>();
+const row = ref<ClientInfo>({
+  id: 0,
+  enabled: true,
+  clientId: '',
+  clientName: '',
+  grantTypes: 'authorization_code',
+  scopes: 'openid',
+  requireConsent: true,
+  requirePkce: false,
+  requireSecret: true,
+  allowPlainTextPkce: false,
+  allowOfflineAccess: false,
+  alwaysIncludeUserClaimsInIdToken: false,
+  allowRememberConsent: true,
+  redirectUris: 'http://localhost:8080/signin-oidc',
+});
 const clientForm = ref();
 const handleEdit = (record: ClientInfo) => {
   row.value = record;
@@ -201,6 +216,10 @@ const handleNew = () => {
     requireConsent: true,
     requirePkce: false,
     requireSecret: true,
+    allowPlainTextPkce: false,
+    allowOfflineAccess: false,
+    alwaysIncludeUserClaimsInIdToken: false,
+    allowRememberConsent: true,
     redirectUris: 'http://localhost:8080/signin-oidc',
   };
   open.value = true;
@@ -209,7 +228,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
   current.value = pagination.current;
   pageSize.value = pagination.pageSize;
   if (sorters.field) {
-    sortField.value = fieldMap[sorters.field] ?? sorters.field; // 由于数据库字段和Json显示字段不一致，所以做了Mapping
+    sortField.value = fieldMap.get(sorters.field) ?? sorters.field; // 由于数据库字段和Json显示字段不一致，所以做了Mapping
     sortOrder.value = sorters.order;
   } else {
     sortField.value = 'Id';
@@ -221,8 +240,9 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
     page: current.value,
     pageSize: pageSize.value,
     sortField: sortField.value,
-    sortOrder: sortOrder.value,
-    filter: filters,
+    sortOrder: sortOrder.value as SortOrder,
+    filters: filters.value,
+    args: args.value,
   });
 };
 </script>

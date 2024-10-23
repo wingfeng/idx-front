@@ -20,17 +20,17 @@ export async function getUserList(params: PageParams) {
 }
 
 export async function getUser(id: string) {
-  return requestClient.get<APIResult<UserInfo>>(apiURL.Get + id);
+  return requestClient.get<UserInfo>(apiURL.Get + id);
 }
 export async function delUser(id: string) {
-  return requestClient.delete<APIResult<UserInfo>>(apiURL.Delete + id);
+  return requestClient.delete<UserInfo>(apiURL.Delete + id);
 }
 export async function saveUser(info: UserInfo) {
-  return requestClient.put<APIResult<UserInfo>>(apiURL.PUT, info);
+  return requestClient.put<UserInfo>(apiURL.PUT, info);
 }
 
 export async function resetPassword(Id: number) {
-  return requestClient.post<APIResult<string>>(apiURL.RESETPASSWORD, {
+  return requestClient.post<string>(apiURL.RESETPASSWORD, {
     Id,
   });
 }

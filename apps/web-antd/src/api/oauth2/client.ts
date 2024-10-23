@@ -1,7 +1,7 @@
 import type {
   ClientInfo,
-  ClientSecretInfo,
   GenSecretParam,
+  GenSecretResponse,
   GetSecretResponse,
 } from '#/types/client';
 import type { PageParams, PageResult } from '#/types/page';
@@ -20,23 +20,20 @@ const apiURL: any = {
 };
 
 export async function getClientList(params: PageParams) {
-  return requestClient.post<APIResult<PageResult<ClientInfo>>>(
-    apiURL.Page,
-    params,
-  );
+  return requestClient.post<PageResult<ClientInfo>>(apiURL.Page, params);
 }
 
 export async function getClient(id: string) {
-  return requestClient.get<APIResult<ClientInfo>>(apiURL.Get + id);
+  return requestClient.get<ClientInfo>(apiURL.Get + id);
 }
 export async function delClient(id: string) {
-  return requestClient.delete<APIResult<ClientInfo>>(apiURL.Delete + id);
+  return requestClient.delete<ClientInfo>(apiURL.Delete + id);
 }
 export async function saveClient(info: ClientInfo) {
-  return requestClient.put<APIResult<ClientInfo>>(apiURL.PUT, info);
+  return requestClient.put<ClientInfo>(apiURL.PUT, info);
 }
 export async function getSecrets(clientid: number) {
-  return requestClient.get<APIResult<GetSecretResponse>>(apiURL.GETSECRET, {
+  return requestClient.get<GetSecretResponse>(apiURL.GETSECRET, {
     params: { clientid },
   });
 }
@@ -48,8 +45,5 @@ export async function delSecret(id: number) {
   });
 }
 export async function generateSecret(params: GenSecretParam) {
-  return requestClient.post<APIResult<ClientSecretInfo>>(
-    apiURL.GenerateSecret,
-    params,
-  );
+  return requestClient.post<GenSecretResponse>(apiURL.GenerateSecret, params);
 }

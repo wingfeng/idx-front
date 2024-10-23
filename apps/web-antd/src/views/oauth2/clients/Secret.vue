@@ -23,9 +23,9 @@ const handleDelete = async (id: number) => {
   refresh();
 };
 const newExpiration = ref<Dayjs>(dayjs().add(1, 'year'));
-const genParam: GenSecretParam = ref({
+const genParam = ref<GenSecretParam>({
   client_id: props.clientId,
-  expiration: newExpiration,
+  expiration: newExpiration.value,
 });
 
 const genError = ref('');
@@ -40,7 +40,7 @@ const onGenerate = async () => {
     console.log(`new secret:${newSecret.value}`);
     refresh();
     openGen.value = false;
-  } catch (error) {
+  } catch (error: any) {
     genError.value = error.msg;
   }
 };
@@ -65,9 +65,9 @@ watch(
     Generate Secrete
   </a-button>
   <div v-if="newSecret !== ''">
-    New secret only show once:
-    <a-tag color="warning">{{ newSecret }}</a-tag> copy it before you close this
-    dialog
+    new secret :
+    <a-tag color="warning">{{ newSecret }}</a-tag> only show once, copy it
+    before you close this dialog
   </div>
   <a-list :data-source="secrets" :loading="loading" item-layout="horizontal">
     <template #renderItem="{ item }">
@@ -80,7 +80,7 @@ watch(
         </a-list-item-meta>
         <template #actions>
           <a-popconfirm
-            title="Delete Client  "
+            title="Delete Secret  "
             @confirm="handleDelete(item.id)"
           >
             <a-button type="link">

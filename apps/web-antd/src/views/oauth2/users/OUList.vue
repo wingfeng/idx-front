@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { OrgUnitInfo } from '#/types/orgUnit';
+
 import { computed, onMounted, ref } from 'vue';
 
 import { getOUTree } from '#/api/system/ou';
@@ -15,7 +17,9 @@ const fieldNames = {
 };
 const expandedKeys = ref<string[]>([]);
 const selectedKeys = ref<string[]>([]);
-const treeData = ref([{ text: 'Orginization Unit', id: '', nodes: [] }]);
+const treeData = ref<Array<OrgUnitInfo>>([
+  { displayName: 'Orginization Unit', id: BigInt(0), children: [] },
+]);
 
 onMounted(() => {
   return getOUTree('')
@@ -30,8 +34,13 @@ onMounted(() => {
 const canSave = computed(() => {
   return true;
 });
-const selectNode = ref({
-  id: 0,
+const selectNode = ref<OrgUnitInfo>({
+  displayName: '',
+  id: BigInt(0),
+
+  parentName: '',
+  name: '',
+  description: '',
 });
 const onSelect = (treeNode: any, e: any) => {
   // console.log('selected node', e);

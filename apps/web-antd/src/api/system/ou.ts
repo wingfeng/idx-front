@@ -1,5 +1,4 @@
 import type { OrgTreeResponse, OrgUnitInfo } from '#/types/orgUnit';
-import type { APIResult } from '#/types/result';
 
 import { requestClient } from '#/api/request';
 
@@ -13,18 +12,13 @@ const apiURL: any = {
 
 export const getOUChildren = async (
   parent: string,
-): Promise<APIResult<Array<OrgUnitInfo>>> => {
-  return await requestClient.get<APIResult<Array<OrgUnitInfo>>>(
-    apiURL.GetChildren,
-    {
-      params: { parent },
-    },
-  );
+): Promise<Array<OrgUnitInfo>> => {
+  return await requestClient.get<Array<OrgUnitInfo>>(apiURL.GetChildren, {
+    params: { parent },
+  });
 };
-export const getOUTree = async (
-  parent: string,
-): Promise<APIResult<OrgTreeResponse>> => {
-  return await requestClient.get<APIResult<OrgTreeResponse>>(apiURL.Tree, {
+export const getOUTree = async (parent: string): Promise<OrgTreeResponse> => {
+  return await requestClient.get<OrgTreeResponse>(apiURL.Tree, {
     params: { parent },
   });
 };

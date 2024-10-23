@@ -2,15 +2,15 @@ export interface OrgUnitInfo {
   /**
    * 唯一标识
    */
-  id: bigint;
+  id?: bigint;
   /**
    * 名称
    */
-  name: string;
+  name?: string;
   /**
    * 显示名称
    */
-  displayName: string;
+  displayName?: string;
   /**
    * 父节点
    */
@@ -18,14 +18,16 @@ export interface OrgUnitInfo {
   /**
    * 父节点名称
    */
-  parentName: string;
+  parentName?: string;
   /**
    * 描述
    */
-  description: string;
+  description?: string;
   /**
    * 排序
    */
+  sortOrder?: number;
+  children?: Array<OrgUnitInfo>;
 }
 export interface OrgTreeResponse {
   items: Array<OrgUnitInfo>;

@@ -1,3 +1,5 @@
+import { Dayjs } from 'dayjs';
+
 export interface ClientInfo {
   id: number;
   enabled: boolean;
@@ -16,7 +18,7 @@ export interface ClientInfo {
   allowRememberConsent: boolean;
   allowPlainTextPkce: boolean;
   logoURI?: string;
-  claims: any;
+  claims?: any;
 }
 
 export interface ClientSecretInfo {
@@ -27,9 +29,12 @@ export interface ClientSecretInfo {
   value: string;
 }
 export interface GenSecretParam {
-  client_id: string;
+  client_id: number;
   name?: string;
-  expiration?: Date;
+  expiration?: Dayjs;
+}
+export interface GenSecretResponse {
+  Secret: string;
 }
 export interface GetSecretResponse {
   Secrets: Array<ClientSecretInfo>;
