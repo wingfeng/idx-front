@@ -52,7 +52,7 @@ const resetForm = () => {
   form.value.resetFields();
 };
 const grantTypesOptions = computed(() => {
-  const types = [];
+  const types: any[] = [];
   OAuth2GrantTypes.forEach((key, v) => {
     types.push({ label: key, value: v });
   });

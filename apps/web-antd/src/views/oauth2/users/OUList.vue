@@ -45,7 +45,7 @@ const selectNode = ref<OrgUnitInfo>({
 const onSelect = (treeNode: any, e: any) => {
   // console.log('selected node', e);
   selectNode.value = e.node.dataRef;
-  console.log('selected node', selectNode.value);
+  console.log('selected node', treeNode);
 };
 </script>
 <template>
