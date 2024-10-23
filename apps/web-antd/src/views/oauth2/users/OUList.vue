@@ -102,7 +102,7 @@ const onSelect = (treeNode: any, e: any) => {
         <a-form-item label="Sort Order">
           <a-input
             v-model:value="selectNode.sortOrder"
-            placeholder="Please enter soft order"
+            placeholder="Please enter sort order"
             type="number"
           />
         </a-form-item>

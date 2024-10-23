@@ -1,6 +1,5 @@
 import type { PageParams, PageResult } from '#/types/page';
-import type { APIResult } from '#/types/result';
-import type { UserInfo } from '#/types/user';
+import type { ResetPwdResponse, UserInfo } from '#/types/user';
 
 import { requestClient } from '#/api/request';
 
@@ -13,10 +12,7 @@ const apiURL: any = {
 };
 
 export async function getUserList(params: PageParams) {
-  return requestClient.post<APIResult<PageResult<UserInfo>>>(
-    apiURL.Page,
-    params,
-  );
+  return requestClient.post<PageResult<UserInfo>>(apiURL.Page, params);
 }
 
 export async function getUser(id: string) {
@@ -30,7 +26,7 @@ export async function saveUser(info: UserInfo) {
 }
 
 export async function resetPassword(Id: number) {
-  return requestClient.post<string>(apiURL.RESETPASSWORD, {
+  return requestClient.post<ResetPwdResponse>(apiURL.RESETPASSWORD, {
     Id,
   });
 }

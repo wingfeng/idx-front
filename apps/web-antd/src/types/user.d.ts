@@ -2,11 +2,11 @@ export interface UserInfo {
   /**
    * 组织ID
    */
-  ouId: string;
+  ouId?: bigint;
   /*
    *组织
    */
-  ou: string;
+  ou?: string;
   /**
    * 用户名
    */
@@ -56,4 +56,8 @@ export interface UserInfo {
    * 密码是否为临时密码
    */
   isTemporaryPassword?: boolean;
+}
+
+export interface ResetPwdResponse {
+  NewPwd: string;
 }

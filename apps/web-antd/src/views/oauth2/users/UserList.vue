@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { OrgUnitInfo } from '#/types/orgUnit';
 import type { SortOrder } from '#/types/page';
 import type { UserInfo } from '#/types/user';
 
@@ -27,10 +28,12 @@ const fieldNames = {
 };
 const expandedKeys = ref<string[]>([]);
 const selectedKeys = ref<string[]>([]);
-const treeData = ref([{ text: 'Expand to load', id: '', nodes: [] }]);
+const treeData = ref<Array<OrgUnitInfo>>([
+  { displayName: 'Expand to load', id: BigInt(0), children: [] },
+]);
 // const treeData = ref({});
 const orgTree = ref();
-const selectNode = ref({});
+const selectNode = ref<OrgUnitInfo>({});
 onMounted(() => {
   return getOUTree('')
     .then((res) => {
@@ -38,7 +41,13 @@ onMounted(() => {
       const items = res.items;
       treeData.value = items;
       orgTree.value = items[0];
-      selectedKeys.value.push(items[0].Id);
+      if (
+        items.length > 0 &&
+        items[0] !== undefined &&
+        items[0].id !== undefined
+      ) {
+        selectedKeys.value.push(String(items[0].id));
+      }
     })
     .catch((error) => {
       console.log('err', error);
@@ -158,12 +167,13 @@ const {
     pageSizeKey: 'pageSize',
   },
 });
-const fieldMap = {
-  Id: 'id',
-  displayname: 'display_name',
-  lockoutenabled: 'lockout_enabled',
-};
 
+const fieldMap = new Map<String, string>([
+  ['displayName', 'display_name'],
+  ['id', 'id'],
+  ['isTemporaryPassword', 'is_temporary_password'],
+  ['lockoutEnabled', 'lockout_enabled'],
+]);
 const pagination = computed(() => ({
   total: total.value,
   current: current.value,
@@ -186,7 +196,7 @@ const onSelect = (treeNode: any, e: any) => {
     filters: filters.value,
     args: args.value,
   });
-  console.log('selected node', selectNode.value);
+  console.log('selected node', treeNode);
 };
 const handleSearch = () => {
   console.log('searchModel', searchModel.value);
@@ -219,7 +229,10 @@ const handleReset = () => {
   }, 500);
 };
 const open = ref<boolean>(false);
-const row = ref<UserInfo>();
+const row = ref<UserInfo>({
+  id: '',
+  displayName: '',
+});
 const modalForm = ref();
 const handleEdit = (record: UserInfo) => {
   row.value = record;
@@ -275,11 +288,11 @@ const handleNew = async () => {
   };
   open.value = true;
 };
-const onTableChange = (pagination: any, filter: any, sorters: any) => {
+const onTableChange = (pagination: any, filters: any, sorters: any) => {
   current.value = pagination.current;
   pageSize.value = pagination.pageSize;
   if (sorters.field) {
-    const fieldName = fieldMap[sorters.field];
+    const fieldName = fieldMap.get(sorters.field);
     sortField.value = fieldName ?? sorters.field;
 
     sortOrder.value = sorters.order;
@@ -287,15 +300,15 @@ const onTableChange = (pagination: any, filter: any, sorters: any) => {
     sortField.value = 'Id';
     sortOrder.value = 'asc';
   }
-  console.log('filter', filters);
+  console.log('filters', filters);
 
   run({
     page: current.value,
     pageSize: pageSize.value,
     sortField: sortField.value,
-    sortOrder: SortOrder[sortOrder.value],
-    filters,
-    args,
+    sortOrder: sortOrder.value as SortOrder,
+    filters: filters.value,
+    args: args.value,
   });
 };
 </script>

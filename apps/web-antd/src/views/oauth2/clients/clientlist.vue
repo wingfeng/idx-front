@@ -119,10 +119,10 @@ const {
   },
 });
 const fieldMap = new Map<String, string>([
-  ['ClientId', 'Client_Id'],
-  ['ClientName', 'Client_Name'],
-  ['GrantTypes', 'Grant_Types'],
-  ['Id', 'id'],
+  ['clientId', 'client_id'],
+  ['clientName', 'client_name'],
+  ['grantTypes', 'grant_types'],
+  ['id', 'id'],
 ]);
 
 const pagination = computed(() => ({
