@@ -15,9 +15,9 @@ const model = computed(() => {
   return props.formModel;
 });
 const fieldNames = {
-  label: 'text',
+  label: 'displayName',
   value: 'id',
-  children: 'nodes',
+  children: 'children',
 };
 const form = ref();
 
@@ -47,7 +47,7 @@ const rules: Record<string, Rule[]> = {
     },
     { min: 3, max: 25, message: 'Length should be 3 to 25', trigger: 'blur' },
   ],
-  displayname: [
+  displayName: [
     {
       required: true,
       message: 'Please input DisplayName',
@@ -68,13 +68,13 @@ const orgInfo = computed({
   get() {
     return {
       label: model.value.ou,
-      value: model.value.ouid,
+      value: model.value.ouId,
     };
   },
   set(v) {
     console.log(v);
     model.value.ou = v.label;
-    model.value.ouid = v.value;
+    model.value.ouId = v.value;
   },
 });
 defineExpose({ validate, resetForm, model });
@@ -106,17 +106,17 @@ defineExpose({ validate, resetForm, model });
     <a-form-item label="Email" name="email" required>
       <a-input v-model:value="model.email" />
     </a-form-item>
-    <a-form-item label="DisplayName" name="displayname" required>
-      <a-input v-model:value="model.displayname" />
+    <a-form-item label="DisplayName" name="displayName" required>
+      <a-input v-model:value="model.displayName" />
     </a-form-item>
     <a-form-item label="Phone Number" name="PhoneNumber">
-      <a-input v-model:value="model.phonenumber" type="number" />
+      <a-input v-model:value="model.phoneNumber" type="number" />
     </a-form-item>
     <a-form-item label="Locked" name="Locked">
-      <a-switch v-model:checked="model.lockoutenabled" />
+      <a-switch v-model:checked="model.lockoutEnabled" />
     </a-form-item>
     <a-form-item label="Temporary Password" name="Temporary">
-      <a-switch v-model:checked="model.istemporarypassword" />
+      <a-switch v-model:checked="model.isTemporaryPassword" />
     </a-form-item>
   </a-form>
 </template>

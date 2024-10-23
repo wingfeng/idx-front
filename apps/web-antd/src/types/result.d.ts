@@ -6,7 +6,7 @@ export interface APIResult<T = any> {
   /**
    * 提示信息
    */
-  msg: string;
+  messsage: string;
   /**
    * 数据
    */

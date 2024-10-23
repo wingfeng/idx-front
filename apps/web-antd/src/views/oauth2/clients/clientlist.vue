@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { ClientInfo } from '#/types/client';
+import type { SortOrder } from '#/types/page';
 
 import { computed, h, ref } from 'vue';
 import { usePagination } from 'vue-request';
@@ -27,36 +28,36 @@ const columns = [
   },
   {
     title: 'Enabled',
-    dataIndex: 'Enabled',
-    key: 'Enabled',
+    dataIndex: 'enabled',
+    key: 'enabled',
     sorter: true,
   },
   {
     title: 'ClientName',
-    dataIndex: 'ClientName',
-    key: 'ClientName',
+    dataIndex: 'clientName',
+    key: 'clientName',
     name: 'client_name',
     sorter: true,
     filtered: true,
   },
   {
     title: 'ClientId',
-    dataIndex: 'ClientId',
+    dataIndex: 'clientId',
     key: 'client_id',
     sorter: true,
     filtered: true,
   },
   {
     title: 'Scopes',
-    dataIndex: 'Scopes',
-    key: 'Scopes',
+    dataIndex: 'scopes',
+    key: 'scopes',
     sorter: true,
     filtered: true,
   },
   {
     title: 'GrantTypes',
-    dataIndex: 'GrantTypes',
-    key: 'GrantTypes',
+    dataIndex: 'grantTypes',
+    key: 'grantTypes',
     sorter: true,
     filtered: true,
   },
@@ -76,14 +77,14 @@ const sortOrder = ref('asc');
 const filters = computed(() => {
   const tmp = [];
   if (searchModel.value.ClientId !== '') {
-    tmp.push(`Client_Id like ?`);
+    tmp.push(`client_Id like ?`);
   }
   if (searchModel.value.ClientName !== '') {
-    tmp.push(`Client_Name like ?`);
+    tmp.push(`client_Name like ?`);
   }
   return tmp;
 });
-const args: Array<string> = computed(() => {
+const args = computed<Array<string>>(() => {
   const tmp = [];
   if (searchModel.value.ClientId !== '') {
     tmp.push(`%${searchModel.value.ClientId}%`);
@@ -102,25 +103,27 @@ const {
   current,
   pageSize,
 } = usePagination(GetClientsPage, {
-  defaultParams: {
-    page: 1,
-    pageSize: 10,
-    sortField: 'id',
-    sortOrder: 'asc',
-    filters,
-    args,
-  },
+  defaultParams: [
+    {
+      page: 1,
+      pageSize: 10,
+      sortField: 'id',
+      sortOrder: 'asc' as SortOrder,
+      filters: filters.value,
+      args: args.value,
+    },
+  ],
   pagination: {
     currentKey: 'page',
     pageSizeKey: 'pageSize',
   },
 });
-const fieldMap = {
-  Id: 'id',
-  ClientName: 'Client_Name',
-  ClientId: 'Client_Id',
-  GrantTypes: 'Grant_Types',
-};
+const fieldMap = new Map<String, string>([
+  ['clientId', 'client_id'],
+  ['clientName', 'client_name'],
+  ['grantTypes', 'grant_types'],
+  ['id', 'id'],
+]);
 
 const pagination = computed(() => ({
   total: total.value,
@@ -129,15 +132,6 @@ const pagination = computed(() => ({
 }));
 
 const reloadTable = () => {
-  // setTimeout(() => {
-  //   run({
-  //     page: current.value,
-  //     pageSize: pageSize.value,
-  //     sortField: sortField.value,
-  //     sortOrder: sortOrder.value,
-  //     filter,
-  //   });
-  // }, 500);
   setTimeout(() => {
     refresh();
   }, 50);
@@ -149,9 +143,9 @@ const handleSearch = () => {
       page: current.value,
       pageSize: pageSize.value,
       sortField: sortField.value,
-      sortOrder: sortOrder.value,
-      filters,
-      args,
+      sortOrder: sortOrder.value as SortOrder,
+      filters: filters.value,
+      args: args.value,
     });
   }, 500);
 };
@@ -164,7 +158,22 @@ const handleReset = () => {
   reloadTable();
 };
 const open = ref<boolean>(false);
-const row = ref<ClientInfo>();
+const row = ref<ClientInfo>({
+  id: 0,
+  enabled: true,
+  clientId: '',
+  clientName: '',
+  grantTypes: 'authorization_code',
+  scopes: 'openid',
+  requireConsent: true,
+  requirePkce: false,
+  requireSecret: true,
+  allowPlainTextPkce: false,
+  allowOfflineAccess: false,
+  alwaysIncludeUserClaimsInIdToken: false,
+  allowRememberConsent: true,
+  redirectUris: 'http://localhost:8080/signin-oidc',
+});
 const clientForm = ref();
 const handleEdit = (record: ClientInfo) => {
   row.value = record;
@@ -198,16 +207,20 @@ const handleCancel = () => {
 };
 const handleNew = () => {
   row.value = {
-    Id: 0,
-    Enabled: true,
-    ClientId: '',
-    ClientName: '',
-    GrantTypes: 'authorization_code',
-    Scopes: 'openid',
-    RequireConsent: true,
-    RequirePkce: false,
-    RequireSecret: true,
-    RedirectUris: 'http://localhost:8080/signin-oidc',
+    id: 0,
+    enabled: true,
+    clientId: '',
+    clientName: '',
+    grantTypes: 'authorization_code',
+    scopes: 'openid',
+    requireConsent: true,
+    requirePkce: false,
+    requireSecret: true,
+    allowPlainTextPkce: false,
+    allowOfflineAccess: false,
+    alwaysIncludeUserClaimsInIdToken: false,
+    allowRememberConsent: true,
+    redirectUris: 'http://localhost:8080/signin-oidc',
   };
   open.value = true;
 };
@@ -215,7 +228,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
   current.value = pagination.current;
   pageSize.value = pagination.pageSize;
   if (sorters.field) {
-    sortField.value = fieldMap[sorters.field] ?? sorters.field; // 由于数据库字段和Json显示字段不一致，所以做了Mapping
+    sortField.value = fieldMap.get(sorters.field) ?? sorters.field; // 由于数据库字段和Json显示字段不一致，所以做了Mapping
     sortOrder.value = sorters.order;
   } else {
     sortField.value = 'Id';
@@ -227,13 +240,11 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
     page: current.value,
     pageSize: pageSize.value,
     sortField: sortField.value,
-    sortOrder: sortOrder.value,
-    filter: filters,
+    sortOrder: sortOrder.value as SortOrder,
+    filters: filters.value,
+    args: args.value,
   });
 };
-// onMounted(() => {
-//   reloadTable();
-// });
 </script>
 <template>
   <div style="overflow-y: scroll">
@@ -294,17 +305,17 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
             </a-popconfirm>
           </a-space>
         </template>
-        <template v-else-if="column.key === 'Enabled'">
+        <template v-else-if="column.key === 'enabled'">
           <a-switch
-            v-model:checked="record.Enabled"
+            v-model:checked="record.enabled"
             enabled="false"
             size="small"
           />
         </template>
-        <template v-else-if="column.key === 'Scopes'">
+        <template v-else-if="column.key === 'scopes'">
           <a-space size="small" wrap>
             <a-tag
-              v-for="sc in record.Scopes.split(' ')"
+              v-for="sc in record.scopes.split(' ')"
               :key="sc"
               color="blue"
             >
@@ -312,10 +323,10 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
             </a-tag>
           </a-space>
         </template>
-        <template v-else-if="column.key === 'GrantTypes'">
+        <template v-else-if="column.key === 'grantTypes'">
           <a-space size="small" wrap>
             <a-tag
-              v-for="gt in record.GrantTypes.split(' ')"
+              v-for="gt in record.grantTypes.split(' ')"
               :key="gt"
               color="geekblue"
             >

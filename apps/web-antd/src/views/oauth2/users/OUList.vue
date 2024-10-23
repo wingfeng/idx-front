@@ -1,27 +1,31 @@
 <script lang="ts" setup>
+import type { OrgUnitInfo } from '#/types/orgUnit';
+
 import { computed, onMounted, ref } from 'vue';
 
 import { getOUTree } from '#/api/system/ou';
 
 const selectFieldNames = {
-  label: 'text',
+  label: 'displayName',
   value: 'id',
-  children: 'nodes',
+  children: 'children',
 };
 const fieldNames = {
-  title: 'text',
+  title: 'displayName',
   key: 'id',
-  children: 'nodes',
+  children: 'children',
 };
 const expandedKeys = ref<string[]>([]);
 const selectedKeys = ref<string[]>([]);
-const treeData = ref([{ text: 'Orginization Unit', id: '', nodes: [] }]);
+const treeData = ref<Array<OrgUnitInfo>>([
+  { displayName: 'Orginization Unit', id: BigInt(0), children: [] },
+]);
 
 onMounted(() => {
   return getOUTree('')
     .then((res) => {
       console.log('res', res);
-      treeData.value = res;
+      treeData.value = res.items;
     })
     .catch((error) => {
       console.log('err', error);
@@ -30,13 +34,18 @@ onMounted(() => {
 const canSave = computed(() => {
   return true;
 });
-const selectNode = ref({
-  id: 0,
+const selectNode = ref<OrgUnitInfo>({
+  displayName: '',
+  id: BigInt(0),
+
+  parentName: '',
+  name: '',
+  description: '',
 });
 const onSelect = (treeNode: any, e: any) => {
   // console.log('selected node', e);
   selectNode.value = e.node.dataRef;
-  console.log('selected node', selectNode.value);
+  console.log('selected node', treeNode);
 };
 </script>
 <template>
@@ -86,14 +95,14 @@ const onSelect = (treeNode: any, e: any) => {
         </a-form-item>
         <a-form-item label="Displayname">
           <a-input
-            v-model:value="selectNode.text"
+            v-model:value="selectNode.displayName"
             placeholder="Please enter Displayname"
           />
         </a-form-item>
         <a-form-item label="Sort Order">
           <a-input
-            v-model:value="selectNode.sortorder"
-            placeholder="Please enter soft order"
+            v-model:value="selectNode.sortOrder"
+            placeholder="Please enter sort order"
             type="number"
           />
         </a-form-item>

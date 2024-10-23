@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { OrgUnitInfo } from '#/types/orgUnit';
+import type { SortOrder } from '#/types/page';
 import type { UserInfo } from '#/types/user';
 
 import { computed, h, onMounted, ref } from 'vue';
@@ -20,24 +22,32 @@ import { DeleteUser, GetUserPage, ResetPassword, SaveUser } from '#/store/user';
 import UserForm from './UserForm.vue';
 
 const fieldNames = {
-  title: 'text',
+  title: 'displayName',
   key: 'id',
-  children: 'nodes',
+  children: 'children',
 };
 const expandedKeys = ref<string[]>([]);
 const selectedKeys = ref<string[]>([]);
-const treeData = ref([{ text: 'Expand to load', id: '', nodes: [] }]);
+const treeData = ref<Array<OrgUnitInfo>>([
+  { displayName: 'Expand to load', id: BigInt(0), children: [] },
+]);
 // const treeData = ref({});
 const orgTree = ref();
-const selectNode = ref({});
+const selectNode = ref<OrgUnitInfo>({});
 onMounted(() => {
   return getOUTree('')
     .then((res) => {
       console.log('treeData', res);
-      treeData.value = res;
-      orgTree.value = res[0];
-      selectedKeys.value.push(res[0].id);
-      console.log('selected Key', selectNode.value);
+      const items = res.items;
+      treeData.value = items;
+      orgTree.value = items[0];
+      if (
+        items.length > 0 &&
+        items[0] !== undefined &&
+        items[0].id !== undefined
+      ) {
+        selectedKeys.value.push(String(items[0].id));
+      }
     })
     .catch((error) => {
       console.log('err', error);
@@ -48,7 +58,7 @@ const columns = [
   {
     title: 'Id',
     dataIndex: 'id',
-    key: 'id',
+    key: 'Id',
     sorter: true,
     defaultSortOrder: 'ascend',
   },
@@ -63,8 +73,8 @@ const columns = [
   },
   {
     title: 'Displayname',
-    dataIndex: 'displayname',
-    key: 'displayname',
+    dataIndex: 'displayName',
+    key: 'displayName',
     sorter: true,
     filtered: true,
   },
@@ -83,14 +93,14 @@ const columns = [
   },
   {
     title: 'Lock Out',
-    dataIndex: 'lockoutenabled',
-    key: 'lockoutenabled',
+    dataIndex: 'lockoutEnabled',
+    key: 'lockoutEnabled',
     sorter: true,
   },
   {
     title: 'Temporary Password',
-    dataIndex: 'istemporarypassword',
-    key: 'istemporarypassword',
+    dataIndex: 'isTemporaryPassword',
+    key: 'isTemporaryPassword',
     sorter: true,
   },
   {
@@ -104,9 +114,9 @@ const searchModel = ref({
   Account: '',
   Displayname: '',
 });
-const sortField = ref('Id');
+const sortField = ref('id');
 const sortOrder = ref('asc');
-const filters = computed(() => {
+const filters = computed<Array<string>>(() => {
   const tmp = [];
   if (searchModel.value.Account !== '') {
     tmp.push(`account like ?`);
@@ -114,20 +124,21 @@ const filters = computed(() => {
   if (searchModel.value.Displayname !== '') {
     tmp.push(`display_name like ?`);
   }
-  if (selectedKeys.value.length > 0) {
+
+  if (selectedKeys.value.length > 0 && selectedKeys.value[0] !== undefined) {
     tmp.push(`ou_id = ?`);
   }
   return tmp;
 });
-const args: Array<string> = computed(() => {
-  const tmp = [];
+const args = computed<Array<string>>(() => {
+  const tmp: string[] = [];
   if (searchModel.value.Account !== '') {
     tmp.push(`%${searchModel.value.Account}%`);
   }
   if (searchModel.value.Displayname !== '') {
     tmp.push(`%${searchModel.value.Displayname}%`);
   }
-  if (selectedKeys.value.length > 0) {
+  if (selectedKeys.value.length > 0 && selectedKeys.value[0] !== undefined) {
     tmp.push(selectedKeys.value[0]);
   }
   return tmp;
@@ -141,24 +152,28 @@ const {
   current,
   pageSize,
 } = usePagination(GetUserPage, {
-  defaultParams: {
-    page: 1,
-    pageSize: 10,
-    sortField: 'Id',
-    sortOrder: 'asc',
-    filters,
-    args,
-  },
+  defaultParams: [
+    {
+      page: 1,
+      pageSize: 10,
+      sortField: 'id',
+      sortOrder: 'asc' as SortOrder,
+      filters: filters.value,
+      args: args.value,
+    },
+  ],
   pagination: {
     currentKey: 'page',
     pageSizeKey: 'pageSize',
   },
 });
-const fieldMap = {
-  displayname: 'display_name',
-  lockoutenabled: 'lockout_enabled',
-};
 
+const fieldMap = new Map<String, string>([
+  ['displayName', 'display_name'],
+  ['id', 'id'],
+  ['isTemporaryPassword', 'is_temporary_password'],
+  ['lockoutEnabled', 'lockout_enabled'],
+]);
 const pagination = computed(() => ({
   total: total.value,
   current: current.value,
@@ -174,10 +189,14 @@ const onSelect = (treeNode: any, e: any) => {
   // console.log('selected node', e);
   selectNode.value = e.node.dataRef;
   run({
-    filters,
-    args,
+    page: current.value,
+    pageSize: pageSize.value,
+    sortField: sortField.value,
+    sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+    filters: filters.value,
+    args: args.value,
   });
-  console.log('selected node', selectNode.value);
+  console.log('selected node', treeNode);
 };
 const handleSearch = () => {
   console.log('searchModel', searchModel.value);
@@ -186,9 +205,9 @@ const handleSearch = () => {
       page: current.value,
       pageSize: pageSize.value,
       sortField: sortField.value,
-      sortOrder: sortOrder.value,
-      filters,
-      args,
+      sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+      filters: filters.value,
+      args: args.value,
     });
   }, 500);
 };
@@ -198,10 +217,22 @@ const handleReset = () => {
     Displayname: '',
   };
   searchForm.value.resetFields();
-  reloadTable();
+  setTimeout(() => {
+    run({
+      page: current.value,
+      pageSize: pageSize.value,
+      sortField: sortField.value,
+      sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+      filters: filters.value,
+      args: args.value,
+    });
+  }, 500);
 };
 const open = ref<boolean>(false);
-const row = ref<UserInfo>();
+const row = ref<UserInfo>({
+  id: '',
+  displayName: '',
+});
 const modalForm = ref();
 const handleEdit = (record: UserInfo) => {
   row.value = record;
@@ -215,13 +246,13 @@ const handleDelete = (Id: string) => {
 };
 const showNewPwd = ref<boolean>(false);
 const newPwd = ref<string>('');
-const handleResetpassword = async (username: string) => {
-  ResetPassword(username).then((pwd) => {
+const handleResetpassword = async (Id: number, userName: string) => {
+  ResetPassword(Id).then((pwd) => {
     Modal.warning({
       title: `Password only show once`,
       content: h('div', {}, [
-        h('p', {}, `user ${username} password resetted to`),
-        h(Tag, { color: 'red' }, `${pwd}`),
+        h('p', {}, `user ${userName} password is resetted to`),
+        h(Tag, { color: 'red' }, `${pwd.NewPwd}`),
       ]),
       onOk() {
         reloadTable();
@@ -252,16 +283,16 @@ const handleNew = async () => {
   const resp = await newId();
   row.value = {
     id: resp.id,
-    ou: selectNode.value.text,
-    ouid: selectNode.value.id,
+    ou: selectNode.value.name,
+    ouId: selectNode.value.id,
   };
   open.value = true;
 };
-const onTableChange = (pagination: any, filter: any, sorters: any) => {
+const onTableChange = (pagination: any, filters: any, sorters: any) => {
   current.value = pagination.current;
   pageSize.value = pagination.pageSize;
   if (sorters.field) {
-    const fieldName = fieldMap[sorters.field];
+    const fieldName = fieldMap.get(sorters.field);
     sortField.value = fieldName ?? sorters.field;
 
     sortOrder.value = sorters.order;
@@ -269,15 +300,15 @@ const onTableChange = (pagination: any, filter: any, sorters: any) => {
     sortField.value = 'Id';
     sortOrder.value = 'asc';
   }
-  console.log('filter', filters);
+  console.log('filters', filters);
 
   run({
     page: current.value,
     pageSize: pageSize.value,
     sortField: sortField.value,
-    sortOrder: sortOrder.value,
-    filters,
-    args,
+    sortOrder: sortOrder.value as SortOrder,
+    filters: filters.value,
+    args: args.value,
   });
 };
 </script>
@@ -365,19 +396,19 @@ const onTableChange = (pagination: any, filter: any, sorters: any) => {
                 <a-popconfirm
                   placement="right"
                   title="Reset Password"
-                  @confirm="handleResetpassword(record.account)"
+                  @confirm="handleResetpassword(record.id, record.account)"
                 >
                   <a-button :icon="h(RollbackOutlined)" danger />
                 </a-popconfirm>
               </a-tooltip>
             </a-space>
           </template>
-          <template v-else-if="column.key === 'lockoutenabled'">
-            <a-switch v-model:checked="record.lockoutenabled" size="small" />
+          <template v-else-if="column.key === 'lockoutEnabled'">
+            <a-switch v-model:checked="record.lockoutEnabled" size="small" />
           </template>
-          <template v-else-if="column.key === 'istemporarypassword'">
+          <template v-else-if="column.key === 'isTemporaryPassword'">
             <a-switch
-              v-model:checked="record.istemporarypassword"
+              v-model:checked="record.isTemporaryPassword"
               size="small"
             />
           </template>
