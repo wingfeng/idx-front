@@ -14,5 +14,6 @@ export const oidcSetting: any = {
   redirect_uri: callbackURL,
   response_type: 'code',
   scope: 'openid profile email',
+  post_logout_redirect_uri: 'http://localhost:5666/',
   stateStore: new WebStorageStateStore({ store: window.localStorage }),
 };

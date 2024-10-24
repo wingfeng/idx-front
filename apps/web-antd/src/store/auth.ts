@@ -82,10 +82,10 @@ export const useAuthStore = defineStore('auth', () => {
     resetAllStores();
     accessStore.setLoginExpired(false);
     if (redirect === true) {
-      const um = new UserManager(oidcSetting);
-      um.signoutRedirect();
+      console.log(`logout${redirect}`);
     }
-
+    const um = new UserManager(oidcSetting);
+    um.signoutRedirect();
     // 回登陆页带上当前路由地址
     // await router.replace({
     //   path: LOGIN_PATH,
