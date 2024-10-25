@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { Rule } from 'ant-design-vue/es/form';
 
-import type { APIInfo } from '#/types/apis';
+import type { ScopeInfo } from '#/types/scope';
 
 import { computed, ref } from 'vue';
 
 const props = defineProps<{
-  formModel: APIInfo;
+  formModel: ScopeInfo;
 }>();
 const model = computed(() => {
   return props.formModel;

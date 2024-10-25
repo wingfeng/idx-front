@@ -75,7 +75,7 @@ const searchModel = ref({
 const sortField = ref('id');
 const sortOrder = ref('asc');
 const filters = computed(() => {
-  const tmp = [];
+  const tmp: Array<string> = [];
   if (searchModel.value.ClientId !== '') {
     tmp.push(`client_Id like ?`);
   }
@@ -85,7 +85,7 @@ const filters = computed(() => {
   return tmp;
 });
 const args = computed<Array<string>>(() => {
-  const tmp = [];
+  const tmp: Array<string> = [];
   if (searchModel.value.ClientId !== '') {
     tmp.push(`%${searchModel.value.ClientId}%`);
   }

@@ -1,59 +1,21 @@
 <script lang="ts" setup>
-import type { OrgUnitInfo } from '#/types/orgUnit';
 import type { SortOrder } from '#/types/page';
 import type { UserInfo } from '#/types/user';
 
-import { computed, h, onMounted, ref } from 'vue';
+import { computed, h, ref } from 'vue';
 import { usePagination } from 'vue-request';
 
 import {
   DeleteOutlined,
-  EditOutlined,
-  MoreOutlined,
   RollbackOutlined,
   SearchOutlined,
 } from '@ant-design/icons-vue';
-import { Modal, Tag } from 'ant-design-vue';
 
-import { getOUTree } from '#/api/system/ou';
-import { newId } from '#/api/system/util';
-import { DeleteUser, GetUserPage, ResetPassword, SaveUser } from '#/store/user';
+import { getRoleMembers } from '#/api/system/role';
 
-import UserForm from './UserForm.vue';
-
-const fieldNames = {
-  title: 'displayName',
-  key: 'id',
-  children: 'children',
-};
-const expandedKeys = ref<string[]>([]);
-const selectedKeys = ref<string[]>([]);
-const treeData = ref<Array<OrgUnitInfo>>([
-  { displayName: 'Expand to load', id: BigInt(0), children: [] },
-]);
-// const treeData = ref({});
-const orgTree = ref();
-const selectNode = ref<OrgUnitInfo>({});
-onMounted(() => {
-  return getOUTree('')
-    .then((res) => {
-      console.log('treeData', res);
-      const items = res.items;
-      treeData.value = items;
-      orgTree.value = items[0];
-      if (
-        items.length > 0 &&
-        items[0] !== undefined &&
-        items[0].id !== undefined
-      ) {
-        selectedKeys.value.push(String(items[0].id));
-      }
-    })
-    .catch((error) => {
-      console.log('err', error);
-    });
-});
-
+const props = defineProps<{
+  roleId: string;
+}>();
 const columns = [
   {
     title: 'Id',
@@ -125,9 +87,6 @@ const filters = computed<Array<string>>(() => {
     tmp.push(`display_name like ?`);
   }
 
-  if (selectedKeys.value.length > 0 && selectedKeys.value[0] !== undefined) {
-    tmp.push(`ou_id = ?`);
-  }
   return tmp;
 });
 const args = computed<Array<string>>(() => {
@@ -138,9 +97,7 @@ const args = computed<Array<string>>(() => {
   if (searchModel.value.Displayname !== '') {
     tmp.push(`%${searchModel.value.Displayname}%`);
   }
-  if (selectedKeys.value.length > 0 && selectedKeys.value[0] !== undefined) {
-    tmp.push(selectedKeys.value[0]);
-  }
+
   return tmp;
 });
 const {
@@ -151,7 +108,7 @@ const {
   total,
   current,
   pageSize,
-} = usePagination(GetUserPage, {
+} = usePagination(getRoleMembers, {
   defaultParams: [
     {
       page: 1,
@@ -161,6 +118,7 @@ const {
       filters: filters.value,
       args: args.value,
     },
+    props.roleId,
   ],
   pagination: {
     currentKey: 'page',
@@ -185,19 +143,7 @@ const reloadTable = () => {
     refresh();
   }, 50);
 };
-const onSelect = (treeNode: any, e: any) => {
-  // console.log('selected node', e);
-  selectNode.value = e.node.dataRef;
-  run({
-    page: current.value,
-    pageSize: pageSize.value,
-    sortField: sortField.value,
-    sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
-    filters: filters.value,
-    args: args.value,
-  });
-  console.log('selected node', treeNode);
-};
+
 const handleSearch = () => {
   console.log('searchModel', searchModel.value);
   setTimeout(() => {
@@ -234,32 +180,13 @@ const row = ref<UserInfo>({
   displayName: '',
 });
 const modalForm = ref();
-const handleEdit = (record: UserInfo) => {
-  row.value = record;
 
-  open.value = true;
-};
 const handleDelete = (Id: string) => {
-  DeleteUser(Id);
-
+  // DeleteUser(Id);
+  console.log('delete', Id);
   reloadTable();
 };
-const showNewPwd = ref<boolean>(false);
-const newPwd = ref<string>('');
-const handleResetpassword = async (Id: number, userName: string) => {
-  ResetPassword(Id).then((pwd) => {
-    Modal.warning({
-      title: `Password only show once`,
-      content: h('div', {}, [
-        h('p', {}, `user ${userName} password is resetted to`),
-        h(Tag, { color: 'red' }, `${pwd.NewPwd}`),
-      ]),
-      onOk() {
-        reloadTable();
-      },
-    });
-  });
-};
+
 const handleOk = async () => {
   try {
     const v = await modalForm.value.validate();
@@ -271,7 +198,7 @@ const handleOk = async () => {
     return;
   }
   console.log('row', row.value);
-  SaveUser(row.value);
+
   open.value = false;
   reloadTable();
 };
@@ -279,15 +206,7 @@ const handleCancel = () => {
   modalForm.value.resetForm();
   open.value = false;
 };
-const handleNew = async () => {
-  const resp = await newId();
-  row.value = {
-    id: resp.id,
-    ou: selectNode.value.name,
-    ouId: selectNode.value.id,
-  };
-  open.value = true;
-};
+
 const onTableChange = (pagination: any, filters: any, sorters: any) => {
   current.value = pagination.current;
   pageSize.value = pagination.pageSize;
@@ -314,18 +233,6 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
 </script>
 <template>
   <a-row :gutter="16" style="height: 400px; margin-bottom: 5px">
-    <a-col :span="4">
-      <a-tree
-        ref="orgTree"
-        v-model:expandedKeys="expandedKeys"
-        v-model:selectedKeys="selectedKeys"
-        :field-names="fieldNames"
-        :tree-data="treeData"
-        style="height: 400px; margin-bottom: 5px"
-        @select="onSelect"
-      />
-    </a-col>
-
     <a-col :span="16">
       <a-page-header
         style="border: 1px solid rgb(235 237 240)"
@@ -355,9 +262,6 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
             Reset
           </a-button>
           <a-divider type="vertical" />
-          <a-button :icon="h(MoreOutlined)" type="primary" @click="handleNew">
-            New
-          </a-button>
         </a-form-item>
       </a-form>
       <a-divider type="horizontal" />
@@ -374,14 +278,6 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
           <template v-if="column.key === 'action'">
             <a-space>
               <a-tooltip>
-                <template #title> Edit</template>
-                <a-button
-                  :icon="h(EditOutlined)"
-                  type="primary"
-                  @click="handleEdit(record)"
-                />
-              </a-tooltip>
-              <a-tooltip>
                 <template #title>Delete</template>
                 <a-popconfirm
                   placement="right"
@@ -391,26 +287,10 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
                   <a-button :icon="h(DeleteOutlined)" danger />
                 </a-popconfirm>
               </a-tooltip>
-              <a-tooltip>
-                <template #title>Reset Password</template>
-                <a-popconfirm
-                  placement="right"
-                  title="Reset Password"
-                  @confirm="handleResetpassword(record.id, record.account)"
-                >
-                  <a-button :icon="h(RollbackOutlined)" danger />
-                </a-popconfirm>
-              </a-tooltip>
             </a-space>
           </template>
           <template v-else-if="column.key === 'lockoutEnabled'">
             <a-switch v-model:checked="record.lockoutEnabled" size="small" />
-          </template>
-          <template v-else-if="column.key === 'isTemporaryPassword'">
-            <a-switch
-              v-model:checked="record.isTemporaryPassword"
-              size="small"
-            />
           </template>
         </template>
       </a-table>
@@ -419,12 +299,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
         title="Edit User Info"
         @cancel="handleCancel"
         @ok="handleOk"
-      >
-        <UserForm ref="modalForm" :form-model="row" :org-tree-data="treeData" />
-      </a-modal>
-      <a-modal v-model:open="showNewPwd" title="New Password">
-        User password is resetted to: <a-tag color="red">{{ newPwd }}</a-tag>
-      </a-modal>
+      />
     </a-col>
   </a-row>
 </template>

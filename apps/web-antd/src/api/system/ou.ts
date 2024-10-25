@@ -5,9 +5,9 @@ import { requestClient } from '#/api/request';
 const apiURL: any = {
   GetChildren: '/api/v1/system/orgunit/getchildren',
   Tree: '/api/v1/system/ou/tree',
-  Get: '/api/v1/oauth2/api/get',
-  PUT: '/api/v1/oauth2/api',
-  Delete: '/api/v1/oauth2/api/del',
+  Get: '/api/v1/oauth2/ou/',
+  PUT: '/api/v1/oauth2/ou',
+  Delete: '/api/v1/oauth2/ou/',
 };
 
 export const getOUChildren = async (

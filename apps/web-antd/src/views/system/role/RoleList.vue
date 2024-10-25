@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type { APIInfo } from '#/types/apis';
+import type { SortOrder } from '#/types/page';
+import type { RoleInfo } from '#/types/role';
 
 import { computed, h, onMounted, ref } from 'vue';
 import { usePagination } from 'vue-request';
@@ -13,42 +14,30 @@ import {
 } from '@ant-design/icons-vue';
 import { Divider, Modal } from 'ant-design-vue';
 
-import { DeleteAPI, GetAPIPage, SaveAPI } from '#/store/apis';
+import { delRole, getRoleList, saveRole } from '#/api/system/role';
 
-import APIForm from './APIForm.vue';
+import RoleForm from './RoleForm.vue';
 
 const columns = [
   {
     title: 'Id',
-    dataIndex: 'Id',
+    dataIndex: 'id',
     key: 'Id',
     sorter: true,
     defaultSortOrder: 'ascend',
   },
-  {
-    title: 'Enabled',
-    dataIndex: 'Enabled',
-    key: 'Enabled',
-    sorter: true,
-  },
+
   {
     title: 'Name',
-    dataIndex: 'Name',
+    dataIndex: 'name',
     key: 'Name',
     name: 'Name',
     sorter: true,
     filtered: true,
   },
   {
-    title: 'DisplayName',
-    dataIndex: 'DisplayName',
-    key: 'DisplayName',
-    sorter: true,
-    filtered: true,
-  },
-  {
     title: 'Description',
-    dataIndex: 'Description',
+    dataIndex: 'description',
     key: 'Description',
     filtered: true,
   },
@@ -58,29 +47,29 @@ const columns = [
   },
 ];
 
-const sortField = ref('Id');
+const sortField = ref('id');
 const sortOrder = ref('asc');
 const searchModel = ref({
   Name: '',
-  DisplayName: '',
+  Description: '',
 });
-const filters: Array<string> = computed(() => {
+const filters = computed<Array<string>>(() => {
   const tmp: Array<string> = [];
   if (searchModel.value.Name !== '') {
-    tmp.push(`Name like ?`);
+    tmp.push(`name like ?`);
   }
-  if (searchModel.value.DisplayName !== '') {
-    tmp.push(`Display_Name like ?`);
+  if (searchModel.value.Description !== '') {
+    tmp.push(`description like ?`);
   }
   return tmp;
 });
-const args: Array<string> = computed(() => {
+const args = computed<Array<string>>(() => {
   const tmp = [];
   if (searchModel.value.Name !== '') {
     tmp.push(`%${searchModel.value.Name}%`);
   }
-  if (searchModel.value.DisplayName !== '') {
-    tmp.push(`%${searchModel.value.DisplayName}%`);
+  if (searchModel.value.Description !== '') {
+    tmp.push(`%${searchModel.value.Description}%`);
   }
   return tmp;
 });
@@ -91,24 +80,22 @@ const {
   total,
   current,
   pageSize,
-} = usePagination(GetAPIPage, {
-  defaultParams: {
-    page: 1,
-    pageSize: 10,
-    sortField: 'Id',
-    sortOrder: 'asc',
-    filters,
-    args,
-  },
+} = usePagination(getRoleList, {
+  defaultParams: [
+    {
+      page: 1,
+      pageSize: 10,
+      sortField: 'Id',
+      sortOrder: 'asc' as SortOrder,
+      filters: filters.value,
+      args: args.value,
+    },
+  ],
   pagination: {
     currentKey: 'page',
     pageSizeKey: 'pageSize',
   },
 });
-const fieldMap = {
-  Id: 'Id',
-  DisplayName: 'display_name',
-};
 
 const pagination = computed(() => ({
   total: total.value,
@@ -123,9 +110,9 @@ const reloadTable = () => {
       page: current.value,
       pageSize: pageSize.value,
       sortField: sortField.value,
-      sortOrder: sortOrder.value,
-      filters,
-      args,
+      sortOrder: sortOrder.value as SortOrder,
+      filters: filters.value,
+      args: args.value,
     });
   }, 500);
 };
@@ -136,26 +123,26 @@ const handleSearch = () => {
 const handleReset = () => {
   searchModel.value = {
     Name: '',
-    DisplayName: '',
+    Description: '',
   };
   searchForm.value.resetFields();
   reloadTable();
 };
 const open = ref<boolean>(false);
-const row = ref<APIInfo>();
+const row = ref<RoleInfo>();
 const modalForm = ref();
 const handleEdit = (record) => {
   row.value = record;
 
   open.value = true;
 };
-const handleDelete = (Id) => {
+const handleDelete = (Id: string) => {
   Modal.confirm({
     title: `Deleting API ${Id}`,
     //  icon: ExclamationCircleOutlined,
     content: `Are you sure delete this API ${Id}?`,
     onOk() {
-      DeleteAPI(Id);
+      delRole(Id);
 
       reloadTable();
     },
@@ -177,7 +164,7 @@ const handleOk = async () => {
     console.log('error submit:', error);
     return;
   }
-  SaveAPI(row.value);
+  saveRole(row.value);
   open.value = false;
   reloadTable();
 };
@@ -187,11 +174,9 @@ const handleCancel = () => {
 };
 const handleNew = () => {
   row.value = {
-    Id: 0,
-    Enabled: true,
-    Name: '',
-    DisplayName: '',
-    Description: '',
+    id: 0,
+    name: '',
+    description: '',
   };
   open.value = true;
 };
@@ -199,7 +184,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
   current.value = pagination.current;
   pageSize.value = pagination.pageSize;
   if (sorters.field) {
-    const fieldName = fieldMap[sorters.field];
+    const fieldName = sorters.field;
     sortField.value = fieldName ?? sorters.field;
 
     sortOrder.value = sorters.order;
@@ -213,8 +198,8 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
     page: current.value,
     pageSize: pageSize.value,
     sortField: sortField.value,
-    sortOrder: sortOrder.value,
-    filter: filters,
+    sortOrder: sortOrder.value as SortOrder,
+    filters: filters.value,
   });
 };
 
@@ -226,17 +211,17 @@ onMounted(() => {
   <div class="p-5">
     <a-page-header
       style="border: 1px solid rgb(235 237 240)"
-      sub-title="API list page"
-      title="APIs"
+      sub-title="Role list page"
+      title="Roles"
     />
     <a-form ref="searchForm" :model="searchModel" layout="inline">
       <a-form-item label="Name">
         <a-input v-model:value="searchModel.Name" placeholder="Name" />
       </a-form-item>
-      <a-form-item label="DisplayName">
+      <a-form-item label="Description">
         <a-input
-          v-model:value="searchModel.DisplayName"
-          placeholder="DisplayName"
+          v-model:value="searchModel.Description"
+          placeholder="Description"
         />
       </a-form-item>
       <a-form-item>
@@ -294,11 +279,11 @@ onMounted(() => {
 
     <a-modal
       v-model:open="open"
-      title="Edit Client Info"
+      title="Edit Role Info"
       @cancel="handleCancel"
       @ok="handleOk"
     >
-      <APIForm ref="modalForm" :form-model="row" />
+      <RoleForm ref="modalForm" :form-model="row" />
     </a-modal>
   </div>
 </template>

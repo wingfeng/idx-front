@@ -52,8 +52,8 @@ const onSelect = (treeNode: any, e: any) => {
   <a-row :gutter="16" style="height: 400px; margin-bottom: 5px">
     <a-col :span="4">
       <a-tree
-        v-model:expandedKeys="expandedKeys"
-        v-model:selectedKeys="selectedKeys"
+        v-model:expanded-keys="expandedKeys"
+        v-model:selected-keys="selectedKeys"
         :field-names="fieldNames"
         :tree-data="treeData"
         auto-expand-parent
