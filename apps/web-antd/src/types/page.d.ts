@@ -1,8 +1,3 @@
-enum SortOrder {
-  Asc = 'asc',
-  Desc = 'desc',
-}
-
 export type PageResult<T> = {
   list: Array<T>;
   page: number;

@@ -5,7 +5,8 @@ import type { UserInfo } from '#/types/user';
 import { requestClient } from '#/api/request';
 
 const apiURL: any = {
-  GetMembers: '/api/v1/system/role/{0}/members',
+  Members: '/api/v1/system/role/{0}/members',
+
   Get: '/api/v1/system/role/',
   PUT: '/api/v1/system/role',
   Delete: '/api/v1/system/role/',
@@ -14,13 +15,7 @@ const apiURL: any = {
 export async function getRoleList(params: PageParams) {
   return requestClient.post<PageResult<RoleInfo>>(apiURL.Page, params);
 }
-export async function getRoleMembers(params: PageParams, id: string) {
-  const p = {
-    ...params,
-    Id: id,
-  };
-  return requestClient.post<PageResult<UserInfo>>(apiURL.GetMembers, p);
-}
+
 export async function getRole(id: string) {
   return requestClient.get<RoleInfo>(apiURL.Get + id);
 }
@@ -29,4 +24,24 @@ export async function delRole(id: string) {
 }
 export async function saveRole(info: RoleInfo) {
   return requestClient.put<RoleInfo>(apiURL.PUT, info);
+}
+export async function getRoleMembers(params: PageParams, id: number) {
+  const url = apiURL.Members.replace('{0}', id);
+  const p = {
+    ...params,
+    Id: id,
+  };
+  return requestClient.post<PageResult<UserInfo>>(url, p);
+}
+export async function addRoleMembers(roleId: number, userIds: Array<bigint>) {
+  const url = apiURL.Members.replace('{0}', roleId);
+  return requestClient.put(url, userIds);
+}
+export async function deleteRoleMembers(id: number, userIds: Array<bigint>) {
+  const url = apiURL.Members.replace('{0}', id);
+  return requestClient.delete(url, {
+    params: {
+      userIds,
+    },
+  });
 }

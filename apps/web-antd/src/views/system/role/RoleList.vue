@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { SortOrder } from '#/types/page';
 import type { RoleInfo } from '#/types/role';
 
 import { computed, h, onMounted, ref } from 'vue';
@@ -15,6 +14,8 @@ import {
 import { Divider, Modal } from 'ant-design-vue';
 
 import { delRole, getRoleList, saveRole } from '#/api/system/role';
+import { newId } from '#/api/system/util';
+import { SortOrder } from '#/types/enum';
 
 import RoleForm from './RoleForm.vue';
 
@@ -48,7 +49,7 @@ const columns = [
 ];
 
 const sortField = ref('id');
-const sortOrder = ref('asc');
+const sortOrder = ref(SortOrder.Asc);
 const searchModel = ref({
   Name: '',
   Description: '',
@@ -85,8 +86,8 @@ const {
     {
       page: 1,
       pageSize: 10,
-      sortField: 'Id',
-      sortOrder: 'asc' as SortOrder,
+      sortField: 'id',
+      sortOrder: SortOrder.Asc,
       filters: filters.value,
       args: args.value,
     },
@@ -172,9 +173,10 @@ const handleCancel = () => {
   modalForm.value.resetForm();
   open.value = false;
 };
-const handleNew = () => {
+const handleNew = async () => {
+  const resp = await newId();
   row.value = {
-    id: 0,
+    id: resp.id,
     name: '',
     description: '',
   };
@@ -189,8 +191,8 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
 
     sortOrder.value = sorters.order;
   } else {
-    sortField.value = 'Id';
-    sortOrder.value = 'asc';
+    sortField.value = 'id';
+    sortOrder.value = SortOrder.Asc;
   }
   console.log('filter', filters);
 
@@ -279,7 +281,9 @@ onMounted(() => {
 
     <a-modal
       v-model:open="open"
+      :mask-closable="false"
       title="Edit Role Info"
+      width="50%"
       @cancel="handleCancel"
       @ok="handleOk"
     >

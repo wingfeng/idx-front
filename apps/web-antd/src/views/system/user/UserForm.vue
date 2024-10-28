@@ -39,10 +39,10 @@ const resetForm = () => {
 const labelCol = { style: { width: '150px' } };
 const wrapperCol = { span: 14 };
 const rules: Record<string, Rule[]> = {
-  account: [
+  userName: [
     {
       required: true,
-      message: 'Please input account',
+      message: 'Please input User Name',
       trigger: 'change',
     },
     { min: 3, max: 25, message: 'Length should be 3 to 25', trigger: 'blur' },
@@ -91,8 +91,8 @@ defineExpose({ validate, resetForm, model });
       <label>{{ model.id }}</label>
     </a-form-item>
 
-    <a-form-item label="Account" name="account" required>
-      <a-input v-model:value="model.account" />
+    <a-form-item label="UserName" name="userName" required>
+      <a-input v-model:value="model.userName" />
     </a-form-item>
     <a-form-item label="Organization" name="ou">
       <a-tree-select

@@ -30,7 +30,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           icon: 'lucide:code-2',
 
-          title: 'APIs',
+          title: 'Scopes',
         },
       },
     ],

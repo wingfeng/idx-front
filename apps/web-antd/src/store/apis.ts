@@ -1,9 +1,9 @@
 import type { PageParams } from '#/types/page';
 
-import { delAPI, getAPIList, saveAPI } from '#/api/oauth2/scope';
+import { delScope, getScopeList, saveAPI } from '#/api/oauth2/scope';
 
 export async function GetAPIPage(params: PageParams) {
-  return getAPIList(params);
+  return getScopeList(params);
   //  return result.data;
 }
 
@@ -12,5 +12,5 @@ export async function SaveAPI(data: any) {
 }
 
 export async function DeleteAPI(id: string) {
-  return delAPI(id);
+  return delScope(id);
 }

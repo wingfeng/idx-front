@@ -11,21 +11,17 @@ const apiURL: any = {
   Delete: '/api/v1/oauth2/scope/',
 };
 
-export async function getAPIList(params: PageParams) {
+export async function getScopeList(params: PageParams) {
   return requestClient.post<PageResult<ScopeInfo>>(apiURL.Page, params);
 }
 
-export async function getAPI(id: string) {
+export async function getScope(id: string) {
   return requestClient.get<APIResult<ScopeInfo>>(apiURL.Get, {
     params: { id },
   });
 }
-export async function delAPI(id: string) {
-  return requestClient.delete<APIResult<ScopeInfo>>(apiURL.Delete, {
-    params: {
-      id,
-    },
-  });
+export async function delScope(id: string) {
+  return requestClient.delete<APIResult<ScopeInfo>>(apiURL.Delete + id);
 }
 export async function saveAPI(info: ScopeInfo) {
   return requestClient.put<APIResult<ScopeInfo>>(apiURL.PUT, info);

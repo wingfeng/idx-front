@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { SortOrder } from '#/types/page';
 import type { UserInfo } from '#/types/user';
 
 import { computed, h, ref } from 'vue';
@@ -11,10 +10,11 @@ import {
   SearchOutlined,
 } from '@ant-design/icons-vue';
 
-import { getRoleMembers } from '#/api/system/role';
+import { deleteRoleMembers, getRoleMembers } from '#/api/system/role';
+import { SortOrder } from '#/types/enum';
 
 const props = defineProps<{
-  roleId: string;
+  id?: number;
 }>();
 const columns = [
   {
@@ -26,20 +26,12 @@ const columns = [
   },
 
   {
-    title: 'Account',
-    dataIndex: 'account',
-    key: 'account',
-    name: 'account',
-    sorter: true,
-    filtered: true,
+    title: 'User Name',
+    dataIndex: 'userName',
+    key: 'userName',
+    name: 'userName',
   },
-  {
-    title: 'Displayname',
-    dataIndex: 'displayName',
-    key: 'displayName',
-    sorter: true,
-    filtered: true,
-  },
+
   {
     title: 'Email',
     dataIndex: 'email',
@@ -53,18 +45,7 @@ const columns = [
     key: 'ou',
     sorter: true,
   },
-  {
-    title: 'Lock Out',
-    dataIndex: 'lockoutEnabled',
-    key: 'lockoutEnabled',
-    sorter: true,
-  },
-  {
-    title: 'Temporary Password',
-    dataIndex: 'isTemporaryPassword',
-    key: 'isTemporaryPassword',
-    sorter: true,
-  },
+
   {
     title: 'Actions',
     key: 'action',
@@ -81,7 +62,7 @@ const sortOrder = ref('asc');
 const filters = computed<Array<string>>(() => {
   const tmp = [];
   if (searchModel.value.Account !== '') {
-    tmp.push(`account like ?`);
+    tmp.push(`user_name like ?`);
   }
   if (searchModel.value.Displayname !== '') {
     tmp.push(`display_name like ?`);
@@ -118,7 +99,7 @@ const {
       filters: filters.value,
       args: args.value,
     },
-    props.roleId,
+    props.id,
   ],
   pagination: {
     currentKey: 'page',
@@ -147,14 +128,17 @@ const reloadTable = () => {
 const handleSearch = () => {
   console.log('searchModel', searchModel.value);
   setTimeout(() => {
-    run({
-      page: current.value,
-      pageSize: pageSize.value,
-      sortField: sortField.value,
-      sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
-      filters: filters.value,
-      args: args.value,
-    });
+    run(
+      {
+        page: current.value,
+        pageSize: pageSize.value,
+        sortField: sortField.value,
+        sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+        filters: filters.value,
+        args: args.value,
+      },
+      props.id,
+    );
   }, 500);
 };
 const handleReset = () => {
@@ -164,14 +148,17 @@ const handleReset = () => {
   };
   searchForm.value.resetFields();
   setTimeout(() => {
-    run({
-      page: current.value,
-      pageSize: pageSize.value,
-      sortField: sortField.value,
-      sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
-      filters: filters.value,
-      args: args.value,
-    });
+    run(
+      {
+        page: current.value,
+        pageSize: pageSize.value,
+        sortField: sortField.value,
+        sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+        filters: filters.value,
+        args: args.value,
+      },
+      props.id,
+    );
   }, 500);
 };
 const open = ref<boolean>(false);
@@ -181,9 +168,9 @@ const row = ref<UserInfo>({
 });
 const modalForm = ref();
 
-const handleDelete = (Id: string) => {
-  // DeleteUser(Id);
-  console.log('delete', Id);
+const handleRemove = (Id: string) => {
+  deleteRoleMembers(props.id, Id);
+
   reloadTable();
 };
 
@@ -232,23 +219,13 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
 };
 </script>
 <template>
-  <a-row :gutter="16" style="height: 400px; margin-bottom: 5px">
+  <a-row :gutter="16" style="margin-bottom: 5px">
     <a-col :span="16">
-      <a-page-header
-        style="border: 1px solid rgb(235 237 240)"
-        sub-title="User list page"
-        title="Users"
-      />
       <a-form ref="searchForm" :model="searchModel" layout="inline">
         <a-form-item label="Account">
           <a-input v-model:value="searchModel.Account" placeholder="Account" />
         </a-form-item>
-        <a-form-item label="Displayname">
-          <a-input
-            v-model:value="searchModel.Displayname"
-            placeholder="Displayname"
-          />
-        </a-form-item>
+
         <a-form-item>
           <a-button type="primary" @click="handleSearch">
             <template #icon><SearchOutlined /></template>
@@ -281,16 +258,13 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
                 <template #title>Delete</template>
                 <a-popconfirm
                   placement="right"
-                  title="Delete User"
-                  @confirm="handleDelete(record.id)"
+                  title="Remove Role Member"
+                  @confirm="handleRemove(record.id)"
                 >
                   <a-button :icon="h(DeleteOutlined)" danger />
                 </a-popconfirm>
               </a-tooltip>
             </a-space>
-          </template>
-          <template v-else-if="column.key === 'lockoutEnabled'">
-            <a-switch v-model:checked="record.lockoutEnabled" size="small" />
           </template>
         </template>
       </a-table>

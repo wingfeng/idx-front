@@ -10,7 +10,7 @@ export interface UserInfo {
   /**
    * 用户名
    */
-  account?: string;
+  userName?: string;
 
   /**
    * 角色

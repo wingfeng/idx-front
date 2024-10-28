@@ -31,18 +31,18 @@ const resetForm = () => {
 const labelCol = { style: { width: '150px' } };
 const wrapperCol = { span: 14 };
 const rules: Record<string, Rule[]> = {
-  Name: [
+  name: [
     {
       required: true,
-      message: 'Please input API name',
+      message: 'Please input scope name',
       trigger: 'change',
     },
     { min: 3, max: 25, message: 'Length should be 3 to 25', trigger: 'blur' },
   ],
-  DisplayName: [
+  description: [
     {
       required: true,
-      message: 'Please input DisplayName',
+      message: 'Please input description',
       trigger: 'change',
     },
     { min: 3, max: 25, message: 'Length should be 3 to 25', trigger: 'blur' },
@@ -59,20 +59,18 @@ defineExpose({ validate, resetForm, model });
     :wrapper-col="wrapperCol"
   >
     <a-form-item label="Id">
-      <a-label>{{ model.Id }}</a-label>
+      <a-label>{{ model.id }}</a-label>
     </a-form-item>
     <a-form-item label="Enabled">
-      <a-checkbox v-model:checked="model.Enabled" />
+      <a-checkbox v-model:checked="model.enabled" />
     </a-form-item>
 
-    <a-form-item label="Name" name="Name" required>
-      <a-input v-model:value="model.Name" />
+    <a-form-item label="Name" name="name" required>
+      <a-input v-model:value="model.name" />
     </a-form-item>
-    <a-form-item label="DisplayName" name="DisplayName" required>
-      <a-input v-model:value="model.DisplayName" />
-    </a-form-item>
-    <a-form-item label="Description" name="Description" required>
-      <a-textarea v-model:value="model.Description" />
+
+    <a-form-item label="Description" name="description" required>
+      <a-textarea v-model:value="model.description" />
     </a-form-item>
   </a-form>
 </template>

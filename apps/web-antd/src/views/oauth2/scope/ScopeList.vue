@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { ScopeInfo } from '#/types/scope';
 
-import { computed, h, onMounted, ref } from 'vue';
+import { computed, h, ref } from 'vue';
 import { usePagination } from 'vue-request';
 
 import {
@@ -11,11 +11,15 @@ import {
   RollbackOutlined,
   SearchOutlined,
 } from '@ant-design/icons-vue';
-import { Divider, Modal } from 'ant-design-vue';
+import { Divider, message, Modal } from 'ant-design-vue';
 
-import { DeleteAPI, GetAPIPage, SaveAPI } from '#/store/apis';
+import { delScope, getScopeList } from '#/api';
+import { SaveAPI } from '#/store/apis';
+import { SortOrder } from '#/types/enum';
 
-import APIForm from './ScopeForm.vue';
+import ScopeForm from './ScopeForm.vue';
+
+const [messageApi, contextHolder] = message.useMessage();
 
 const columns = [
   {
@@ -55,25 +59,25 @@ const sortField = ref('id');
 const sortOrder = ref('asc');
 const searchModel = ref({
   Name: '',
-  DisplayName: '',
+  Description: '',
 });
-const filters: Array<string> = computed(() => {
+const filters = computed<Array<string>>(() => {
   const tmp: Array<string> = [];
   if (searchModel.value.Name !== '') {
-    tmp.push(`Name like ?`);
+    tmp.push(`name like ?`);
   }
-  if (searchModel.value.DisplayName !== '') {
-    tmp.push(`Display_Name like ?`);
+  if (searchModel.value.Description !== '') {
+    tmp.push(`description like ?`);
   }
   return tmp;
 });
-const args: Array<string> = computed(() => {
+const args = computed<Array<string>>(() => {
   const tmp = [];
   if (searchModel.value.Name !== '') {
     tmp.push(`%${searchModel.value.Name}%`);
   }
-  if (searchModel.value.DisplayName !== '') {
-    tmp.push(`%${searchModel.value.DisplayName}%`);
+  if (searchModel.value.Description !== '') {
+    tmp.push(`%${searchModel.value.Description}%`);
   }
   return tmp;
 });
@@ -84,24 +88,22 @@ const {
   total,
   current,
   pageSize,
-} = usePagination(GetAPIPage, {
-  defaultParams: {
-    page: 1,
-    pageSize: 10,
-    sortField: 'Id',
-    sortOrder: 'asc',
-    filters,
-    args,
-  },
+} = usePagination(getScopeList, {
+  defaultParams: [
+    {
+      page: 1,
+      pageSize: 10,
+      sortField: 'id',
+      sortOrder: SortOrder.Asc,
+      filters: [],
+      args: [],
+    },
+  ],
   pagination: {
     currentKey: 'page',
     pageSizeKey: 'pageSize',
   },
 });
-const fieldMap = {
-  Id: 'Id',
-  DisplayName: 'display_name',
-};
 
 const pagination = computed(() => ({
   total: total.value,
@@ -116,7 +118,7 @@ const reloadTable = () => {
       page: current.value,
       pageSize: pageSize.value,
       sortField: sortField.value,
-      sortOrder: sortOrder.value,
+      sortOrder: sortOrder.value as SortOrder,
       filters,
       args,
     });
@@ -129,7 +131,7 @@ const handleSearch = () => {
 const handleReset = () => {
   searchModel.value = {
     Name: '',
-    DisplayName: '',
+    Description: '',
   };
   searchForm.value.resetFields();
   reloadTable();
@@ -142,15 +144,20 @@ const handleEdit = (record) => {
 
   open.value = true;
 };
-const handleDelete = (Id) => {
+const handleDelete = (Id: string) => {
   Modal.confirm({
-    title: `Deleting API ${Id}`,
+    title: `Deleting Scope ${Id}`,
     //  icon: ExclamationCircleOutlined,
-    content: `Are you sure delete this API ${Id}?`,
+    content: `Are you sure delete this Scope ${Id}?`,
     onOk() {
-      DeleteAPI(Id);
-
-      reloadTable();
+      delScope(Id)
+        .then(() => {
+          reloadTable();
+        })
+        .catch((error) => {
+          messageApi.warning(error);
+          console.log(error);
+        });
     },
     onCancel() {
       console.log('Cancel');
@@ -180,11 +187,10 @@ const handleCancel = () => {
 };
 const handleNew = () => {
   row.value = {
-    Id: 0,
-    Enabled: true,
-    Name: '',
-    DisplayName: '',
-    Description: '',
+    id: 0,
+    enabled: true,
+    name: '',
+    description: '',
   };
   open.value = true;
 };
@@ -192,7 +198,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
   current.value = pagination.current;
   pageSize.value = pagination.pageSize;
   if (sorters.field) {
-    const fieldName = fieldMap[sorters.field];
+    const fieldName = sorters.field;
     sortField.value = fieldName ?? sorters.field;
 
     sortOrder.value = sorters.order;
@@ -206,30 +212,27 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
     page: current.value,
     pageSize: pageSize.value,
     sortField: sortField.value,
-    sortOrder: sortOrder.value,
-    filter: filters,
+    sortOrder: sortOrder.value as SortOrder,
+    filters: filters.value,
   });
 };
-
-onMounted(() => {
-  reloadTable();
-});
 </script>
 <template>
   <div class="p-5">
+    <context-holder />
     <a-page-header
       style="border: 1px solid rgb(235 237 240)"
-      sub-title="API list page"
-      title="APIs"
+      sub-title="Scopes list page"
+      title="Scopes"
     />
     <a-form ref="searchForm" :model="searchModel" layout="inline">
       <a-form-item label="Name">
         <a-input v-model:value="searchModel.Name" placeholder="Name" />
       </a-form-item>
-      <a-form-item label="DisplayName">
+      <a-form-item label="Description">
         <a-input
-          v-model:value="searchModel.DisplayName"
-          placeholder="DisplayName"
+          v-model:value="searchModel.Description"
+          placeholder="Description"
         />
       </a-form-item>
       <a-form-item>
@@ -273,14 +276,14 @@ onMounted(() => {
             <a-button
               :icon="h(DeleteOutlined)"
               danger
-              @click="handleDelete(record.Id)"
+              @click="handleDelete(record.id)"
             >
               Delete
             </a-button>
           </a-space>
         </template>
         <template v-else-if="column.key === 'Enabled'">
-          <a-checkbox v-model:checked="record.Enabled" />
+          <a-checkbox v-model:checked="record.enabled" />
         </template>
       </template>
     </a-table>
@@ -291,7 +294,7 @@ onMounted(() => {
       @cancel="handleCancel"
       @ok="handleOk"
     >
-      <APIForm ref="modalForm" :form-model="row" />
+      <ScopeForm ref="modalForm" :form-model="row" />
     </a-modal>
   </div>
 </template>

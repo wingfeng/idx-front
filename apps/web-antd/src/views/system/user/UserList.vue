@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { OrgUnitInfo } from '#/types/orgUnit';
-import type { SortOrder } from '#/types/page';
 import type { UserInfo } from '#/types/user';
 
 import { computed, h, onMounted, ref } from 'vue';
@@ -18,6 +17,7 @@ import { Modal, Tag } from 'ant-design-vue';
 import { getOUTree } from '#/api/system/ou';
 import { newId } from '#/api/system/util';
 import { DeleteUser, GetUserPage, ResetPassword, SaveUser } from '#/store/user';
+import { SortOrder } from '#/types/enum';
 
 import UserForm from './UserForm.vue';
 
@@ -64,10 +64,10 @@ const columns = [
   },
 
   {
-    title: 'Account',
-    dataIndex: 'account',
-    key: 'account',
-    name: 'account',
+    title: 'User Name',
+    dataIndex: 'userName',
+    key: 'userName',
+    name: 'userName',
     sorter: true,
     filtered: true,
   },
@@ -157,7 +157,7 @@ const {
       page: 1,
       pageSize: 10,
       sortField: 'id',
-      sortOrder: 'asc' as SortOrder,
+      sortOrder: SortOrder.Asc,
       filters: filters.value,
       args: args.value,
     },
@@ -222,7 +222,7 @@ const handleReset = () => {
       page: current.value,
       pageSize: pageSize.value,
       sortField: sortField.value,
-      sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
+      sortOrder: sortOrder.value as SortOrder,
       filters: filters.value,
       args: args.value,
     });
@@ -313,7 +313,7 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
 };
 </script>
 <template>
-  <a-row :gutter="16" style="height: 400px; margin-bottom: 5px">
+  <a-row :gutter="16" style="margin-bottom: 5px">
     <a-col :span="4">
       <a-tree
         ref="orgTree"
