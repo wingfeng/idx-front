@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { RoleInfo } from '#/types/role';
+import type { GroupInfo } from '#/types/group';
 
 import { computed, h, onMounted, ref } from 'vue';
 import { usePagination } from 'vue-request';
@@ -13,11 +13,11 @@ import {
 } from '@ant-design/icons-vue';
 import { Divider, Modal } from 'ant-design-vue';
 
-import { delRole, getRoleList, saveRole } from '#/api/system/role';
+import { del, getList, save } from '#/api/system/group';
 import { newId } from '#/api/system/util';
 import { SortOrder } from '#/types/enum';
 
-import RoleForm from './RoleForm.vue';
+import GroupForm from './GroupForm.vue';
 
 const columns = [
   {
@@ -81,7 +81,7 @@ const {
   total,
   current,
   pageSize,
-} = usePagination(getRoleList, {
+} = usePagination(getList, {
   defaultParams: [
     {
       page: 1,
@@ -130,7 +130,7 @@ const handleReset = () => {
   reloadTable();
 };
 const open = ref<boolean>(false);
-const row = ref<RoleInfo>();
+const row = ref<GroupInfo>();
 const modalForm = ref();
 const handleEdit = (record) => {
   row.value = record;
@@ -139,13 +139,11 @@ const handleEdit = (record) => {
 };
 const handleDelete = (Id: string, name: string) => {
   Modal.confirm({
-    title: `Deleting Role ${Id}`,
+    title: `Deleting Group ${Id}`,
     //  icon: ExclamationCircleOutlined,
-    content: `Are you sure delete this role ${name}?`,
+    content: `Are you sure delete this group: ${name}?`,
     onOk() {
-      delRole(Id);
-
-      reloadTable();
+      del(Id).then(() => reloadTable());
     },
     onCancel() {
       console.log('Cancel');
@@ -165,7 +163,7 @@ const handleOk = async () => {
     console.log('error submit:', error);
     return;
   }
-  saveRole(row.value);
+  save(row.value);
   open.value = false;
   reloadTable();
 };
@@ -194,7 +192,6 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
     sortField.value = 'id';
     sortOrder.value = SortOrder.Asc;
   }
-  console.log('filter', filters);
 
   run({
     page: current.value,
@@ -213,8 +210,8 @@ onMounted(() => {
   <div class="p-5">
     <a-page-header
       style="border: 1px solid rgb(235 237 240)"
-      sub-title="Role list page"
-      title="Roles"
+      sub-title="Group list page"
+      title="Groups"
     />
     <a-form ref="searchForm" :model="searchModel" layout="inline">
       <a-form-item label="Name">
@@ -279,12 +276,12 @@ onMounted(() => {
     <a-modal
       v-model:open="open"
       :mask-closable="false"
-      title="Edit Role Info"
+      title="Edit Group Info"
       width="50%"
       @cancel="handleCancel"
       @ok="handleOk"
     >
-      <RoleForm ref="modalForm" :form-model="row" />
+      <GroupForm ref="modalForm" :form-model="row" />
     </a-modal>
   </div>
 </template>

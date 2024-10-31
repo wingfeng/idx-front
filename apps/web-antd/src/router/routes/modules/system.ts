@@ -36,7 +36,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'Groups',
         path: 'Groups',
-        component: () => import('#/views/system/user/GroupList.vue'),
+        component: () => import('#/views/system/group/GroupList.vue'),
         meta: {
           title: 'Groups',
           icon: 'lucide:users-2',

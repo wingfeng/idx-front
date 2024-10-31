@@ -46,7 +46,8 @@ onMounted(() => {
         items[0] !== undefined &&
         items[0].id !== undefined
       ) {
-        selectedKeys.value.push(String(items[0].id));
+        // selectedKeys.value.push(String(items[0].id));
+        expandedKeys.value.push(String(items[0].id));
       }
     })
     .catch((error) => {

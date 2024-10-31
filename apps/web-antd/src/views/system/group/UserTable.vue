@@ -8,11 +8,7 @@ import { DeleteOutlined } from '@ant-design/icons-vue';
 import { debounce } from 'lodash-es';
 
 import { getUserList } from '#/api';
-import {
-  addRoleMembers,
-  deleteRoleMembers,
-  getRoleMembers,
-} from '#/api/system/role';
+import { addMembers, deleteMembers, getMembers } from '#/api/system/group';
 import { SortOrder } from '#/types/enum';
 
 const props = defineProps<{
@@ -83,7 +79,7 @@ const {
   total,
   current,
   pageSize,
-} = usePagination(getRoleMembers, {
+} = usePagination(getMembers, {
   defaultParams: [
     {
       page: 1,
@@ -119,42 +115,6 @@ const reloadTable = () => {
   }, 50);
 };
 
-// const handleSearch = () => {
-//   console.log('searchModel', searchModel.value);
-//   setTimeout(() => {
-//     run(
-//       {
-//         page: current.value,
-//         pageSize: pageSize.value,
-//         sortField: sortField.value,
-//         sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
-//         filters: filters.value,
-//         args: args.value,
-//       },
-//       props.id,
-//     );
-//   }, 500);
-// };
-// const handleReset = () => {
-//   searchModel.value = {
-//     Account: '',
-//     Displayname: '',
-//   };
-//   searchForm.value.resetFields();
-//   setTimeout(() => {
-//     run(
-//       {
-//         page: current.value,
-//         pageSize: pageSize.value,
-//         sortField: sortField.value,
-//         sortOrder: sortOrder.value as SortOrder, // SortOrder[sortOrder.value as keyof typeof SortOrder],
-//         filters: filters.value,
-//         args: args.value,
-//       },
-//       props.id,
-//     );
-//   }, 500);
-// };
 const open = ref<boolean>(false);
 const row = ref<UserInfo>({
   id: '',
@@ -163,7 +123,7 @@ const row = ref<UserInfo>({
 const modalForm = ref();
 
 const handleRemove = (Id: string) => {
-  deleteRoleMembers(props.id, Id);
+  deleteMembers(props.id, Id);
 
   reloadTable();
 };
@@ -202,14 +162,17 @@ const onTableChange = (pagination: any, filters: any, sorters: any) => {
   }
   console.log('filters', filters);
 
-  run({
-    page: current.value,
-    pageSize: pageSize.value,
-    sortField: sortField.value,
-    sortOrder: sortOrder.value as SortOrder,
-    filters: filters.value,
-    args: args.value,
-  });
+  run(
+    {
+      page: current.value,
+      pageSize: pageSize.value,
+      sortField: sortField.value,
+      sortOrder: sortOrder.value as SortOrder,
+      filters: filters.value,
+      args: args.value,
+    },
+    props.id,
+  );
 };
 
 const state = reactive({
@@ -248,7 +211,7 @@ const handleAddMember = () => {
     ids.push(s.value);
   });
   console.log('ids', ids);
-  addRoleMembers(props.id, ids).then(() => {
+  addMembers(props.id, ids).then(() => {
     reloadTable();
     state.data = [];
     state.value = [];

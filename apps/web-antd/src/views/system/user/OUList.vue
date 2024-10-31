@@ -26,6 +26,10 @@ onMounted(() => {
     .then((res) => {
       console.log('res', res);
       treeData.value = res.items;
+      if (treeData.value.length > 0) {
+        // selectedKeys.value.push(String(treeData.value[0].id));
+        expandedKeys.value.push(String(treeData.value[0].id));
+      }
     })
     .catch((error) => {
       console.log('err', error);

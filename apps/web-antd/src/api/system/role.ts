@@ -35,7 +35,9 @@ export async function getRoleMembers(params: PageParams, id: number) {
 }
 export async function addRoleMembers(roleId: number, userIds: Array<bigint>) {
   const url = apiURL.Members.replace('{0}', roleId);
-  return requestClient.put(url, userIds);
+  return requestClient.put(url, {
+    userIds,
+  });
 }
 export async function deleteRoleMembers(id: number, userIds: Array<bigint>) {
   const url = apiURL.Members.replace('{0}', id);
